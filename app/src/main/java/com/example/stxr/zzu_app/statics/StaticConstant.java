@@ -2,6 +2,9 @@ package com.example.stxr.zzu_app.statics;
 
 import android.os.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
  *  项目名：  ZZU_App
  *  包名：    com.example.stxr.zzu_app.utils
@@ -47,4 +50,22 @@ public class StaticConstant {
     public static final String DB_COURSE_TIME = "时间";
     //标示
     public static final String DB_COURSE_LABEL = "标示";
+    //地点搜索的正则表达式
+    public static final Map<String, String> CLASS_LOCATION_MAP = new HashMap<String, String>() {
+        {
+            put(".*?北.*?1.*?","北1");
+            put(".*?北.*?2.*?","北2");
+            put(".*?北.*?3.*?","北3");
+            put(".*?北.*?4.*?","北4");
+            put(".*?北.*?5.*?","北5");
+            put(".*?北.*?6.*?","北6");
+            put(".*?南.*?1.*?","南1");
+            put(".*?南.*?2.*?","南2");
+            put(".*?南.*?3.*?","南3");
+            put(".*?南.*?4.*?","南4");
+            put(".*?南.*?5.*?","南5");
+            put(".*?南.*?6.*?","南6");
+        }
+    };
+    public static final String BMOB_ID = "0d8645e714e934bd3e4773a5eb33512b";
 }
