@@ -1,21 +1,17 @@
 package com.example.stxr.zzu_app;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import com.example.stxr.zzu_app.bean.Course;
-import com.example.stxr.zzu_app.statics.StaticConstant;
+import com.example.stxr.zzu_app.bean.MyBBS;
 import com.example.stxr.zzu_app.utils.BaiduMapUtils;
-import com.example.stxr.zzu_app.utils.DBManager;
-import com.example.stxr.zzu_app.utils.DataUtils;
 import com.example.stxr.zzu_app.utils.L;
-import com.example.stxr.zzu_app.utils.MySQliteHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 //    private DBManager dbManager;
     private BaiduMapUtils baiduMapUtils;
     private Course course;
+    private MyBBS myBBS;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
         course = new Course(this);
         course.onCreate();
+
+        myBBS = new MyBBS();
+
 //        //初始化gps获取
 //        L.i(DataUtils.getSysTime());
 //        L.i(DataUtils.getYear());
@@ -59,15 +59,21 @@ public class MainActivity extends AppCompatActivity {
 //                    L.i(c.toString());
 //                }
                 baiduMapUtils.getClassLocation();
-                List<String> courseList = new ArrayList<>(course.getFreeClassroomByLocation());
+                List<String> courseList = new ArrayList<>(course.getFreeClassroom(true));
+
                 text.setText(baiduMapUtils.getLocation()+"\n" //地理poi信息
                         +baiduMapUtils.getClassLocation()+"\n" //过滤后的教室信息
                         +courseList.toString());
-                for (String s : courseList) {
-                    L.i(s);
-                }
+//                for (String s : courseList) {
+//                    L.i(s);
+//                }
                 break;
             case R.id.btn_gps:
+                text.setText(course.getFreeClassroom(false).toString());
+//                myBBS.put("第一次报道","小螃蟹","第一次提交，希望成功。");
+//                myBBS.setTitle("第二次报道");
+//                myBBS.query("453c32914b");
+//                L.i(myBBS.getTitle()+"");
 //                L.i(DataUtils.getWeekday() + "  weekday");
 //                L.i(baiduMapUtils.getLocation());
 //                if (baiduMapUtils.getLocation().matches(".*?1.*?楼.*?")) {

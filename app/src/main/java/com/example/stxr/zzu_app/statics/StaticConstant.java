@@ -14,6 +14,8 @@ import java.util.Map;
  *  描述：     一些静态的全局常量
  */
 public class StaticConstant {
+    //闪屏页的延时标志
+    public static final int HANDLE_SPLASH =  1001;
     //数据库的名字
     public static final String DB_COURSE_NAME = "zzu_course2017.db";
     //数据库版本号

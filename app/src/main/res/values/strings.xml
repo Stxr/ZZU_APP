@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ZZU_App</string>
+    <string name="splash_text">你来了，“郑”好</string>
+    <string name="forgot_password">忘记密码</string>
+    <string name="register">注册</string>
+    <string name="login">登录</string>
 </resources>
