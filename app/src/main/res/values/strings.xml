@@ -4,4 +4,7 @@
     <string name="forgot_password">忘记密码</string>
     <string name="register">注册</string>
     <string name="login">登录</string>
+    <string name="title1">找教室</string>
+    <string name="title2">发帖吧</string>
+    <string name="title3">设置</string>
 </resources>

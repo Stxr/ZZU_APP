@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class TestActivity extends AppCompatActivity {
     public static TextView text;
 //    private MySQliteHelper helper;
 //    private DBManager dbManager;
@@ -24,13 +24,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_test);
         text = (TextView) findViewById(R.id.text);
 
-        baiduMapUtils = new BaiduMapUtils(this);
-        baiduMapUtils.onCreate();
+//        baiduMapUtils = new BaiduMapUtils(this);
+//        baiduMapUtils.onCreate();
 
-        course = new Course(this);
+        course = new Course(getApplicationContext());
         course.onCreate();
 
         myBBS = new MyBBS();
@@ -58,18 +58,16 @@ public class MainActivity extends AppCompatActivity {
 //                for (Course c : list) {
 //                    L.i(c.toString());
 //                }
-                baiduMapUtils.getClassLocation();
-                List<String> courseList = new ArrayList<>(course.getFreeClassroom(true));
+//                baiduMapUtils.getClassLocation();
+                List<String> courseList = new ArrayList<>(course.getFreeClassroomByLocation(true));
 
-                text.setText(baiduMapUtils.getLocation()+"\n" //地理poi信息
-                        +baiduMapUtils.getClassLocation()+"\n" //过滤后的教室信息
-                        +courseList.toString());
+                text.setText(courseList.toString());
 //                for (String s : courseList) {
 //                    L.i(s);
 //                }
                 break;
             case R.id.btn_gps:
-                text.setText(course.getFreeClassroom(false).toString());
+                text.setText(course.getFreeClassroomByLocation(false).toString());
 //                myBBS.put("第一次报道","小螃蟹","第一次提交，希望成功。");
 //                myBBS.setTitle("第二次报道");
 //                myBBS.query("453c32914b");
