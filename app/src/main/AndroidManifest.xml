@@ -37,24 +37,41 @@
                 </action>
             </intent-filter>
         </service>
+        <!--忘记密码-->
+        <activity android:name=".ui.ForgetActivity"
+            android:label="忘记密码"
+            android:screenOrientation="portrait"/>
         <!--主界面-->
-        <activity android:name=".ui.BottomNavigationActivity"/>
+        <activity android:name=".ui.BottomNavigationActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"/>
+        <!--显示文章的界面-->
+        <activity android:name=".ui.ShowPassageActivity"
+            android:screenOrientation="portrait"
+            android:label="文章"/>
         <!--发布文章界面-->
         <activity
-            android:name=".ui.PassageActivity" />
+            android:name=".ui.PassageActivity"
+            android:screenOrientation="portrait"
+            android:label="发帖"/>
         <!--登录界面-->
-        <activity android:name=".ui.LoginActivity"/>
+        <activity android:name=".ui.LoginActivity"
+            android:screenOrientation="portrait"/>
         <!--注册界面-->
-        <activity android:name=".ui.RegisteredActivity"/>
+        <activity android:name=".ui.RegisteredActivity"
+            android:screenOrientation="portrait" />
         <!--主界面-->
         <activity android:name=".ui.MainActivity"
-            android:theme="@style/NoActionBarFullscreen"/>
+            android:theme="@style/NoActionBarFullscreen"
+            android:screenOrientation="portrait"/>
         <!--测试界面-->
-        <activity android:name=".TestActivity"/>
+        <activity android:name=".TestActivity"
+            android:screenOrientation="portrait"/>
         <!--闪屏界面-->
         <activity
             android:name=".ui.SplashActivity"
-            android:theme="@style/NoActivityFullscreen" >
+            android:theme="@style/NoActivityFullscreen"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

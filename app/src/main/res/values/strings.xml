@@ -7,4 +7,10 @@
     <string name="title1">找教室</string>
     <string name="title2">发帖吧</string>
     <string name="title3">设置</string>
+    <string name="text_email_send_ok">发送成功</string>
+    <string name="text_email_send_no">发送失败</string>
+    <string name="text_tost_empty">输入框不能为空</string>
+    <string name="reset_successfully">重置成功</string>
+    <string name="text_two_input_not_consistent">两次输入密码不一致</string>
+    <string name="reset_failed">重置失败</string>
 </resources>
