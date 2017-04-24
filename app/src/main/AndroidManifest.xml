@@ -66,16 +66,18 @@
             android:screenOrientation="portrait"/>
         <!--测试界面-->
         <activity android:name=".TestActivity"
-            android:screenOrientation="portrait"/>
-        <!--闪屏界面-->
-        <activity
-            android:name=".ui.SplashActivity"
-            android:theme="@style/NoActivityFullscreen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <!--闪屏界面-->
+        <activity
+            android:name=".ui.SplashActivity"
+            android:theme="@style/NoActivityFullscreen"
+            android:screenOrientation="portrait">
+
         </activity>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
