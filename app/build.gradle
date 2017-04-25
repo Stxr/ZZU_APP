@@ -34,7 +34,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
     //抓包用
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+  //  compile 'com.squareup.okhttp3:okhttp:3.4.1'
     //解析用
     compile 'org.jsoup:jsoup:1.10.2'
     //加特效的fab

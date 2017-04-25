@@ -14,6 +14,10 @@ import com.example.stxr.zzu_app.utils.BaiduMapUtils;
 import com.example.stxr.zzu_app.utils.HttpUtils;
 import com.example.stxr.zzu_app.utils.L;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +34,26 @@ public class TestActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             //text.setText((String) msg.obj);
-            L.e((String) msg.obj);
+          //  L.e((String) msg.obj);
+            Document doc = Jsoup.parse((String) msg.obj);
+            //标题
+            Elements title = doc.select("span");
+            //上课的时间
+            Elements courseTime = doc.select("td[align]");
+            Elements course = doc.select("table#table3 tr");//找到id=table3 的table 下面所有的tr
+//            L.e(title.text());
+//            L.e(courseTime.get(1).text());//得到第二个值
+            //L.e(course.get(0).text()); //星期2 第一节课
+            //L.e(course.get(1).childNodeSize()+"");
+            String[][] courseTable = new String[7][10];
+            for(int i=0;i<course.size();i++) {
+                for(int j=0;j<course.get(1).childNodeSize();j++) {
+                    courseTable[i][j]=course.get(i).child(j).text();
+                }
+                L.e(courseTable[i][0]+courseTable[i][1]+courseTable[i][2]
+                        +courseTable[i][3]+courseTable[i][4]+courseTable[i][5]
+                        +courseTable[i][6]+courseTable[i][7]);
+            }
         }
     };
     @Override

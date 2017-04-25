@@ -24,7 +24,7 @@
     <application
         android:name=".application.BaseApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/classroom"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -44,6 +44,10 @@
         <!--主界面-->
         <activity android:name=".ui.BottomNavigationActivity"
             android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait">
+        </activity>
+        <!--绑定账号的界面-->
+        <activity android:name=".ui.BindActivity"
             android:screenOrientation="portrait"/>
         <!--显示文章的界面-->
         <activity android:name=".ui.ShowPassageActivity"
@@ -67,16 +71,17 @@
         <!--测试界面-->
         <activity android:name=".TestActivity"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
         <!--闪屏界面-->
         <activity
             android:name=".ui.SplashActivity"
             android:theme="@style/NoActivityFullscreen"
             android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
 
         </activity>
         <meta-data

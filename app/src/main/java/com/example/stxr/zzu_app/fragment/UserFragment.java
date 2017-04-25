@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,10 @@ import android.widget.Toast;
 
 import com.example.stxr.zzu_app.R;
 import com.example.stxr.zzu_app.bean.MyUser;
+import com.example.stxr.zzu_app.ui.BindActivity;
 import com.example.stxr.zzu_app.ui.LoginActivity;
 import com.example.stxr.zzu_app.utils.L;
+import com.example.stxr.zzu_app.utils.ShareUtils;
 
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -37,6 +40,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     private Button btn_commit;
     private View view;
     private Drawable edt_defaultBK;
+    private Button btn_bind;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -48,6 +52,12 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
 
     private void initData() {
         setEnable(false);
+        boolean isBind = ShareUtils.getBoolean(getActivity(), "idBind", false);
+        if(isBind){
+            btn_bind.setText("更改绑定");
+        }else {
+            btn_bind.setText("绑定账号");
+        }
         //显示信息
         MyUser userInfo = BmobUser.getCurrentUser(MyUser.class);
         edt_name.setText(userInfo.getUsername());
@@ -56,6 +66,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     }
 
     private void initView() {
+        btn_bind = (Button) view.findViewById(R.id.btn_bind);
         btn_commit = (Button) view.findViewById(R.id.btn_commit);
         edt_desc = (EditText) view.findViewById(R.id.et_desc);
         edt_sex = (EditText) view.findViewById(R.id.et_sex);
@@ -67,6 +78,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         edt_desc.setOnLongClickListener(this);
         edt_name.setOnLongClickListener(this);
         edt_sex.setOnLongClickListener(this);
+        btn_bind.setOnClickListener(this);
     }
 
     private void setEnable(boolean is) {
@@ -113,6 +125,25 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                     }
                 });
                 break;
+            //绑定校园网账号
+            case R.id.btn_bind:
+                startActivity(new Intent(getActivity(),BindActivity.class));
+                break;
+
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        boolean isBind = ShareUtils.getBoolean(getActivity(), "idBind", false);
+        if(isBind){
+            btn_bind.setText("更改绑定");
+        }else {
+            ShareUtils.putString(getActivity(), "mima", "");
+            ShareUtils.putString(getActivity(),"year","");
+            ShareUtils.putString(getActivity(), "xuehao", "");
+            btn_bind.setText("绑定账号");
         }
     }
 

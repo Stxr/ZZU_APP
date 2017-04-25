@@ -14,6 +14,7 @@ import java.util.Map;
  *  描述：     一些静态的全局常量
  */
 public class StaticConstant {
+    public static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 779;
     //闪屏页的延时标志
     public static final int HANDLE_SPLASH =  1001;
     //数据库的名字

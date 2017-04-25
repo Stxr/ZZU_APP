@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ZZU_App</string>
+    <string name="app_name">找自习室</string>
     <string name="splash_text">你来了，“郑”好</string>
     <string name="forgot_password">忘记密码</string>
     <string name="register">注册</string>
@@ -13,4 +13,5 @@
     <string name="reset_successfully">重置成功</string>
     <string name="text_two_input_not_consistent">两次输入密码不一致</string>
     <string name="reset_failed">重置失败</string>
+    <string name="title4">课程表</string>
 </resources>
