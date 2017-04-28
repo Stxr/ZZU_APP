@@ -64,9 +64,11 @@ public class ExchangeFragment extends Fragment {
                 Intent intent = new Intent(getContext(),ShowPassageActivity.class);
                 TextView tv_title = (TextView) view.findViewById(R.id.tv_title);
                 TextView tv_content = (TextView) view.findViewById(R.id.tv_content);
+                TextView tv_objectID = (TextView) view.findViewById(R.id.tv_ObjectID);
                //通过intent传键值对上去
                 intent.putExtra("title",tv_title.getText().toString());
                 intent.putExtra("content", tv_content.getText().toString());
+                intent.putExtra("ObjectID", tv_objectID.getTag().toString());
                 startActivity(intent);
             }
         });
@@ -106,6 +108,7 @@ public class ExchangeFragment extends Fragment {
         BmobQuery<MyBBS> q = new BmobQuery<>();
         //按时间降序排序
         q.order("-createdAt");
+        q.include("author");
         //查询20条信息
         q.setLimit(num);
         q.findObjects(new FindListener<MyBBS>() {

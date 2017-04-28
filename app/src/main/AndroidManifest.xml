@@ -37,6 +37,10 @@
                 </action>
             </intent-filter>
         </service>
+        <!--考试倒计时-->
+        <activity android:name=".ui.CountDownActivity"
+            android:label="考试倒计时"
+            android:screenOrientation="portrait"/>
         <!--忘记密码-->
         <activity android:name=".ui.ForgetActivity"
             android:label="忘记密码"
