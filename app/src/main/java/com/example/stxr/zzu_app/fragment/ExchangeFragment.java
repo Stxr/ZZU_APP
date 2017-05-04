@@ -19,16 +19,12 @@ import com.example.stxr.zzu_app.ui.ShowPassageActivity;
 import com.example.stxr.zzu_app.utils.L;
 import com.example.stxr.zzu_app.utils.T;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
-
-import static com.example.stxr.zzu_app.R.id.tv_ObjectID;
 
 /*
  *  项目名：  ZZU_App
