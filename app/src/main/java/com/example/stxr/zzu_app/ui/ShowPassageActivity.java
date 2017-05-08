@@ -29,36 +29,43 @@ import com.example.stxr.zzu_app.bean.Comments;
 import com.example.stxr.zzu_app.bean.MyBBS;
 import com.example.stxr.zzu_app.bean.MyUser;
 import com.example.stxr.zzu_app.utils.L;
+import com.example.stxr.zzu_app.utils.ShareUtils;
+import com.example.stxr.zzu_app.utils.StringUtils;
 import com.example.stxr.zzu_app.utils.T;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.example.stxr.zzu_app.xrichtext.RichTextView;
+import com.example.stxr.zzu_app.xrichtext.SDCardUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.DownloadFileListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+import me.iwf.photopicker.PhotoPicker;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class ShowPassageActivity extends BaseActivity implements View.OnClickListener {
     private TextView tv_showReply;
     private TextView tv_showTitle;
-    private TextView tv_showContent;
+//    private TextView tv_showContent;
+    private RichTextView rtv_showContent;
     private RecyclerView rv_showComments;
     private LinearLayout ll_comment_send;
     private Button btn_comment_send;
     private EditText edt_comment;
     private List<Comments> commentsList = new ArrayList<>();
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private Subscription subsLoading;
 
     @Override
 
@@ -72,11 +79,13 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
 
     private void initData() {
         tv_showTitle.setText(getIntent().getStringExtra("title"));
-        tv_showContent.setText(getIntent().getStringExtra("content"));
+//        rtv_showContent.setText(getIntent().getStringExtra("content"));
+//        rtv_showContent.createTextView()
+        showDataSync(getIntent().getStringExtra("content"));
     }
 
     private void initView() {
-        tv_showContent = (TextView) findViewById(R.id.tv_showContent);
+        rtv_showContent = (RichTextView) findViewById(R.id.rtv_showContent);
         tv_showTitle = (TextView) findViewById(R.id.tv_showTitle);
         tv_showReply = (TextView) findViewById(R.id.tv_showReply);
         rv_showComments = (RecyclerView) findViewById(R.id.rv_showComments);
@@ -119,10 +128,11 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                 break;
         }
     }
+
     //上传回复的数据
     private Comments commit(String text) {
         MyUser user = BmobUser.getCurrentUser(MyUser.class);
-        MyBBS post= new MyBBS();
+        MyBBS post = new MyBBS();
         post.setObjectId(getIntent().getStringExtra("ObjectID"));
         Comments comments = new Comments();
         comments.setAuthor(user);
@@ -134,7 +144,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                 if (e == null) {
                     T.shortShow(ShowPassageActivity.this, "发表成功");
                 } else {
-                    T.shortShow(ShowPassageActivity.this, "发表失败"+e.getMessage());
+                    T.shortShow(ShowPassageActivity.this, "发表失败" + e.getMessage());
                 }
             }
         });
@@ -153,6 +163,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         CommitAdapter commitAdapter = new CommitAdapter(this, commentsList);
         rv_showComments.setAdapter(commitAdapter);
     }
+
     //从服务器上下载评论
     private void downloadComment() {
         BmobQuery<Comments> query = new BmobQuery<Comments>();
@@ -161,7 +172,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         //时间倒序
         //query.order("-updatedAt");
         //查询当前帖子所有的评论
-        query.addWhereEqualTo("post",new BmobPointer(post));
+        query.addWhereEqualTo("post", new BmobPointer(post));
         //查询发评论的作者和帖子的作者
         query.include("author,post.author");
         query.findObjects(new FindListener<Comments>() {
@@ -185,7 +196,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
 
     }
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -197,4 +208,91 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
             }
         }
     };
+    /**
+     * 显示数据
+     * @param html
+     */
+    private void showEditData(final Subscriber<? super String> subscriber, final String html) {
+        try {
+            List<String> textList = StringUtils.cutStringByImgTag(html);
+            for (int i = 0; i < textList.size(); i++) {
+                String text = textList.get(i);
+                L.e("text" + text);
+                if (text.contains("<img")) {
+                    final String imagePath = StringUtils.getImgSrc(text);
+                    String fileName = StringUtils.getFileName(imagePath) + ".txr";
+                    String fileUrl = ShareUtils.getString(ShowPassageActivity.this, fileName, null);
+                    if (new File(imagePath).exists()) {
+                        subscriber.onNext(imagePath);
+                    } else {
+                        BmobFile file = new BmobFile(fileName, "", fileUrl);
+                        file.download(new File(imagePath), new DownloadFileListener() {
+                            @Override
+                            public void done(String s, BmobException e) {
+                                if (e == null) {
+                                    T.shortShow(ShowPassageActivity.this, "下载成功");
+                                    L.e("下载路径：" + s);
+//                                    subscriber.onNext(s);
+                                    //  showEditData(subscriber,html);
+                                } else {
+                                    T.shortShow(ShowPassageActivity.this, "下载失败");
+                                }
+                            }
+                            @Override
+                            public void onProgress(Integer integer, long l) {
+
+                            }
+                        });
+//                        subscriber.onNext(imagePath);
+                        T.shortShow(ShowPassageActivity.this, "图片" + i + "已丢失，请重新插入！");
+                    }
+                } else {
+                    subscriber.onNext(text);
+                }
+            }
+            subscriber.onCompleted();
+        } catch (Exception e) {
+            e.printStackTrace();
+            subscriber.onError(e);
+        }
+    }
+    /**
+     * 异步方式显示数据
+     * @param html
+     */
+    private void showDataSync(final String html){
+//        loadingDialog.show();
+
+        subsLoading = Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                showEditData(subscriber, html);
+            }
+        })
+                .onBackpressureBuffer()
+                .subscribeOn(Schedulers.io())//生产事件在io
+                .observeOn(AndroidSchedulers.mainThread())//消费事件在UI线程
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onCompleted() {
+//                        loadingDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+//                        loadingDialog.dismiss();
+                        e.printStackTrace();
+                        T.shortShow(ShowPassageActivity.this,"解析错误：图片不存在或已损坏");
+                    }
+
+                    @Override
+                    public void onNext(String text) {
+                        if (text.contains(SDCardUtil.getPictureDir())){
+                            rtv_showContent.addImageViewAtIndex(rtv_showContent.getLastIndex(), text);
+                        } else {
+                            rtv_showContent.addTextViewAtIndex(rtv_showContent.getLastIndex(), text);
+                        }
+                    }
+                });
+    }
 }

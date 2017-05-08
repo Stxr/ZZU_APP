@@ -1,10 +1,12 @@
 package com.example.stxr.zzu_app.fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,23 +72,34 @@ public class ExchangeFragment extends Fragment {
         });
         lv_passage.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, int position, long id) {
                 L.e("长按了" + position);
-                TextView tv_objectID = (TextView) view.findViewById(R.id.tv_ObjectID);
-                L.e(tv_objectID.getTag().toString());
-                MyBBS bbs = new MyBBS();
-                bbs.setObjectId(tv_objectID.getTag().toString());
-                bbs.delete(new UpdateListener() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("提示");
+                builder.setMessage("确定删除此帖？");
+                builder.setCancelable(false);
+                builder.setNegativeButton("取消", null);
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
-                    public void done(BmobException e) {
-                        if (e==null) {
-                            T.shortShow(getContext(),"删除成功");
-                        }else {
-                            T.shortShow(getContext(),"删除失败");
-                        }
+                    public void onClick(DialogInterface dialog, int which) {
+                        TextView tv_objectID = (TextView) view.findViewById(R.id.tv_ObjectID);
+                        L.e(tv_objectID.getTag().toString());
+                        MyBBS bbs = new MyBBS();
+                        bbs.setObjectId(tv_objectID.getTag().toString());
+                        bbs.delete(new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if (e==null) {
+                                    T.shortShow(getContext(),"删除成功");
+                                    showData(20);
+                                }else {
+                                    T.shortShow(getContext(),"删除失败");
+                                }
+                            }
+                        });
                     }
                 });
-                showData(20);
+                builder.create().show();
                 return true;
             }
         });

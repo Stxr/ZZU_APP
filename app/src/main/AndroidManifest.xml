@@ -37,6 +37,11 @@
                 </action>
             </intent-filter>
         </service>
+        <!--图片选择器-->
+        <activity
+            android:theme="@style/NoActionBarFullscreen"
+            android:name="me.iwf.photopicker.PhotoPickerActivity"
+            android:screenOrientation="portrait" />
         <!--考试倒计时-->
         <activity android:name=".ui.CountDownActivity"
             android:label="考试倒计时"
@@ -73,9 +78,12 @@
             android:theme="@style/NoActionBarFullscreen"
             android:screenOrientation="portrait"/>
         <!--测试界面-->
-        <activity android:name=".TestActivity"
+        <activity android:name=".test.TestActivity"
             android:screenOrientation="portrait">
-
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
         <!--闪屏界面-->
         <activity
@@ -86,7 +94,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
