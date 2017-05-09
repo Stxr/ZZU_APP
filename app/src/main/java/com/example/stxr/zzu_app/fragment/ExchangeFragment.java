@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +23,10 @@ import com.example.stxr.zzu_app.bean.MyBBS;
 import com.example.stxr.zzu_app.ui.ShowPassageActivity;
 import com.example.stxr.zzu_app.utils.L;
 import com.example.stxr.zzu_app.utils.T;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
@@ -37,14 +43,14 @@ import cn.bmob.v3.listener.UpdateListener;
  *  描述：    交流
  */
 public class ExchangeFragment extends Fragment {
-    private SwipeRefreshLayout srl_fresh;
     public static final String ARGUMENT = "isSent";
-    private ListView lv_passage;
+    private XRecyclerView xclv_passage;
     private Context context;
     private List<MyBBS> passageList;
     private MyBBS passage;
     private View view;
     private PassageAdapter pad;
+    private int numsLoad;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,60 +61,36 @@ public class ExchangeFragment extends Fragment {
     }
 
     private void initData() {
-        showData(20);
-        lv_passage.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getContext(),ShowPassageActivity.class);
-                TextView tv_title = (TextView) view.findViewById(R.id.tv_title);
-                TextView tv_content = (TextView) view.findViewById(R.id.tv_content);
-                TextView tv_objectID = (TextView) view.findViewById(R.id.tv_ObjectID);
-               //通过intent传键值对上去
-                intent.putExtra("title",tv_title.getText().toString());
-                intent.putExtra("content", tv_content.getText().toString());
-                intent.putExtra("ObjectID", tv_objectID.getTag().toString());
-                startActivity(intent);
-            }
-        });
-        lv_passage.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, final View view, int position, long id) {
-                L.e("长按了" + position);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("提示");
-                builder.setMessage("确定删除此帖？");
-                builder.setCancelable(false);
-                builder.setNegativeButton("取消", null);
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        TextView tv_objectID = (TextView) view.findViewById(R.id.tv_ObjectID);
-                        L.e(tv_objectID.getTag().toString());
-                        MyBBS bbs = new MyBBS();
-                        bbs.setObjectId(tv_objectID.getTag().toString());
-                        bbs.delete(new UpdateListener() {
-                            @Override
-                            public void done(BmobException e) {
-                                if (e==null) {
-                                    T.shortShow(getContext(),"删除成功");
-                                    showData(20);
-                                }else {
-                                    T.shortShow(getContext(),"删除失败");
-                                }
-                            }
-                        });
-                    }
-                });
-                builder.create().show();
-                return true;
-            }
-        });
+//        pad = new PassageAdapter(getActivity(), new ArrayList<MyBBS>());
+        showData(10);
+        xclv_passage.setLayoutManager(new LinearLayoutManager(context));
+        //上拉刷新
+        xclv_passage.setLoadingMoreEnabled(true);
         //下拉刷新
-        srl_fresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        xclv_passage.setPullRefreshEnabled(true);
+        xclv_passage.setRefreshProgressStyle(ProgressStyle.SquareSpin);
+        xclv_passage.setLoadingMoreProgressStyle(ProgressStyle.BallScale);
+        xclv_passage.setLoadingListener(new XRecyclerView.LoadingListener() {
             @Override
             public void onRefresh() {
-                showData(20);
-                srl_fresh.setRefreshing(false);
+                xclv_passage.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showData(10);
+                        xclv_passage.refreshComplete();
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onLoadMore() {
+                xclv_passage.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadMoreData(2);
+                        xclv_passage.loadMoreComplete();
+                    }
+                }, 1000);
             }
         });
     }
@@ -119,32 +101,124 @@ public class ExchangeFragment extends Fragment {
         q.order("-createdAt");
         q.include("author");
         //查询20条信息
+        numsLoad = num;
         q.setLimit(num);
         q.findObjects(new FindListener<MyBBS>() {
             @Override
             public void done(List<MyBBS> list, BmobException e) {
                 if (e == null) {
-                    pad = new PassageAdapter(getContext(), list);
-                    lv_passage.setAdapter(pad);
+                    Message message = new Message();
+                    message.what = 1;
+                    message.obj = list;
+                    handler.sendMessage(message);
                 } else {
-                    T.shortShow(getContext(), "加载失败" + e.getMessage() + "," + e.getErrorCode());
+                    T.shortShow(getActivity(), "加载失败" + e.getMessage() + "," + e.getErrorCode());
                 }
             }
         });
     }
 
+    private void loadMoreData(int num) {
+        BmobQuery<MyBBS> q = new BmobQuery<>();
+        //按时间降序排序
+        q.order("-createdAt");
+        q.include("author");
+        //查询20条信息
+        q.setSkip(numsLoad);
+        q.setLimit(numsLoad + num);
+        numsLoad = numsLoad + num;
+        q.findObjects(new FindListener<MyBBS>() {
+            @Override
+            public void done(List<MyBBS> list, BmobException e) {
+                if (e == null) {
+                    Message message = new Message();
+                    message.what = 2;
+                    message.obj = list;
+                    handler.sendMessage(message);
+                } else {
+                    T.shortShow(getActivity(), "加载失败" + e.getMessage() + "," + e.getErrorCode());
+                }
+            }
+        });
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-        //pad.notifyDataSetChanged();
-        showData(20);
+        showData(numsLoad);
     }
 
     private void initView() {
-        lv_passage = (ListView) view.findViewById(R.id.lv_passage);
-        srl_fresh = (SwipeRefreshLayout) view.findViewById(R.id.srl_refresh);
+        xclv_passage = (XRecyclerView) view.findViewById(R.id.xclv_passage);
     }
 
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1:
+                    passageList = (List<MyBBS>) msg.obj;
+                    pad = new PassageAdapter(getActivity(), passageList);
+                    xclv_passage.setAdapter(pad);
+                    pad.setOnItemClickListener(new PassageAdapter.OnRecyclerViewItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, MyBBS myBBS) {
+                            Intent intent = new Intent(getContext(), ShowPassageActivity.class);
+                            //通过intent传键值对上去
+                            intent.putExtra("title", myBBS.getTitle());
+                            intent.putExtra("content", myBBS.getContent());
+                            intent.putExtra("ObjectID", myBBS.getObjectId());
+                            intent.putExtra("createdTime", myBBS.getCreatedAt());
+                            intent.putExtra("username", myBBS.getAuthor().getUsername());
+                            myBBS.increment("visits");
+                            myBBS.update(new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+
+                                }
+                            });
+                            startActivity(intent);
+                        }
+                    });
+                    pad.setOnItemLongClickListener(new PassageAdapter.OnRecyclerViewItemLongClickListener() {
+                        @Override
+                        public void onItemLongClick(final View view, MyBBS myBBS) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("提示");
+                            builder.setMessage("确定删除此帖？");
+                            builder.setCancelable(false);
+                            builder.setNegativeButton("取消", null);
+                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    TextView tv_objectID = (TextView) view.findViewById(R.id.tv_ObjectID);
+                                    L.e(tv_objectID.getTag().toString());
+                                    MyBBS bbs = new MyBBS();
+                                    bbs.setObjectId(tv_objectID.getTag().toString());
+                                    bbs.delete(new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                            if (e == null) {
+                                                T.shortShow(getContext(), "删除成功");
+                                                showData(numsLoad);
+                                            } else {
+                                                T.shortShow(getContext(), "删除失败");
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            builder.create().show();
+                        }
+                    });
+                    break;
+                case 2:
+                    passageList.addAll((List<MyBBS>) msg.obj);
+                    pad.notifyDataSetChanged();
+                    break;
+            }
+        }
+    };
 
 }

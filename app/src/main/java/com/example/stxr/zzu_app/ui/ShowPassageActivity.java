@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +35,10 @@ import com.example.stxr.zzu_app.utils.StringUtils;
 import com.example.stxr.zzu_app.utils.T;
 import com.example.stxr.zzu_app.xrichtext.RichTextView;
 import com.example.stxr.zzu_app.xrichtext.SDCardUtil;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,14 +63,22 @@ import rx.schedulers.Schedulers;
 public class ShowPassageActivity extends BaseActivity implements View.OnClickListener {
     private TextView tv_showReply;
     private TextView tv_showTitle;
-//    private TextView tv_showContent;
+    //    private TextView tv_showContent;
     private RichTextView rtv_showContent;
     private RecyclerView rv_showComments;
     private LinearLayout ll_comment_send;
     private Button btn_comment_send;
     private EditText edt_comment;
+    private TextView tv_creatTime;
+    private TextView tv_author;
     private List<Comments> commentsList = new ArrayList<>();
     private Subscription subsLoading;
+    private SwipeRefreshLayout srl_passage_refresh;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
 
@@ -75,17 +88,43 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         initView();
         initData();
         downloadComment();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void initData() {
         tv_showTitle.setText(getIntent().getStringExtra("title"));
-//        rtv_showContent.setText(getIntent().getStringExtra("content"));
-//        rtv_showContent.createTextView()
-        showDataSync(getIntent().getStringExtra("content"));
+        tv_author.setText(getIntent().getStringExtra("username"));
+        tv_creatTime.setText(getIntent().getStringExtra("createdTime"));
+        rtv_showContent.post(new Runnable() {
+            @Override
+            public void run() {
+                rtv_showContent.clearAllLayout();
+                showDataSync(getIntent().getStringExtra("content"));
+            }
+        });
+        //下拉刷新
+        srl_passage_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                rtv_showContent.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        rtv_showContent.clearAllLayout();
+                        showDataSync(getIntent().getStringExtra("content"));
+                    }
+                });
+                srl_passage_refresh.setRefreshing(false);
+            }
+        });
     }
 
     private void initView() {
+        srl_passage_refresh = (SwipeRefreshLayout) findViewById(R.id.srl_passage_refresh);
         rtv_showContent = (RichTextView) findViewById(R.id.rtv_showContent);
+        tv_creatTime = (TextView) findViewById(R.id.tv_creatTime);
+        tv_author = (TextView) findViewById(R.id.tv_author);
         tv_showTitle = (TextView) findViewById(R.id.tv_showTitle);
         tv_showReply = (TextView) findViewById(R.id.tv_showReply);
         rv_showComments = (RecyclerView) findViewById(R.id.rv_showComments);
@@ -208,15 +247,18 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
             }
         }
     };
+
     /**
      * 显示数据
+     *
      * @param html
      */
     private void showEditData(final Subscriber<? super String> subscriber, final String html) {
         try {
-            List<String> textList = StringUtils.cutStringByImgTag(html);
+            final List<String> textList = StringUtils.cutStringByImgTag(html);
             for (int i = 0; i < textList.size(); i++) {
-                String text = textList.get(i);
+                final String text = textList.get(i);
+                final int finalI = i;
                 L.e("text" + text);
                 if (text.contains("<img")) {
                     final String imagePath = StringUtils.getImgSrc(text);
@@ -238,13 +280,13 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                                     T.shortShow(ShowPassageActivity.this, "下载失败");
                                 }
                             }
+
                             @Override
                             public void onProgress(Integer integer, long l) {
 
                             }
                         });
 //                        subscriber.onNext(imagePath);
-                        T.shortShow(ShowPassageActivity.this, "图片" + i + "已丢失，请重新插入！");
                     }
                 } else {
                     subscriber.onNext(text);
@@ -256,11 +298,13 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
             subscriber.onError(e);
         }
     }
+
     /**
      * 异步方式显示数据
+     *
      * @param html
      */
-    private void showDataSync(final String html){
+    private void showDataSync(final String html) {
 //        loadingDialog.show();
 
         subsLoading = Observable.create(new Observable.OnSubscribe<String>() {
@@ -282,17 +326,53 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                     public void onError(Throwable e) {
 //                        loadingDialog.dismiss();
                         e.printStackTrace();
-                        T.shortShow(ShowPassageActivity.this,"解析错误：图片不存在或已损坏");
+                        T.shortShow(ShowPassageActivity.this, "解析错误：图片不存在或已损坏");
                     }
 
                     @Override
                     public void onNext(String text) {
-                        if (text.contains(SDCardUtil.getPictureDir())){
+                        if (text.contains(SDCardUtil.getPictureDir())) {
                             rtv_showContent.addImageViewAtIndex(rtv_showContent.getLastIndex(), text);
                         } else {
                             rtv_showContent.addTextViewAtIndex(rtv_showContent.getLastIndex(), text);
                         }
                     }
                 });
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("ShowPassage Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
     }
 }
