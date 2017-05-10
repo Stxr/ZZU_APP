@@ -9,6 +9,7 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,8 @@ public class ExchangeFragment extends Fragment {
         xclv_passage.setLoadingMoreEnabled(true);
         //下拉刷新
         xclv_passage.setPullRefreshEnabled(true);
+        //添加分界线
+        xclv_passage.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         xclv_passage.setRefreshProgressStyle(ProgressStyle.SquareSpin);
         xclv_passage.setLoadingMoreProgressStyle(ProgressStyle.BallScale);
         xclv_passage.setLoadingListener(new XRecyclerView.LoadingListener() {
@@ -145,7 +148,7 @@ public class ExchangeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        showData(numsLoad);
+        loadMoreData(numsLoad);
     }
 
     private void initView() {
@@ -183,7 +186,7 @@ public class ExchangeFragment extends Fragment {
                     });
                     pad.setOnItemLongClickListener(new PassageAdapter.OnRecyclerViewItemLongClickListener() {
                         @Override
-                        public void onItemLongClick(final View view, MyBBS myBBS) {
+                        public void onItemLongClick(final View view, final MyBBS myBBS) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("提示");
                             builder.setMessage("确定删除此帖？");
@@ -192,11 +195,7 @@ public class ExchangeFragment extends Fragment {
                             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    TextView tv_objectID = (TextView) view.findViewById(R.id.tv_ObjectID);
-                                    L.e(tv_objectID.getTag().toString());
-                                    MyBBS bbs = new MyBBS();
-                                    bbs.setObjectId(tv_objectID.getTag().toString());
-                                    bbs.delete(new UpdateListener() {
+                                    myBBS.delete(new UpdateListener() {
                                         @Override
                                         public void done(BmobException e) {
                                             if (e == null) {
@@ -214,8 +213,10 @@ public class ExchangeFragment extends Fragment {
                     });
                     break;
                 case 2:
-                    passageList.addAll((List<MyBBS>) msg.obj);
-                    pad.notifyDataSetChanged();
+                    if ((List<MyBBS>) msg.obj != null && passageList != null) {
+                        passageList.addAll((List<MyBBS>) msg.obj);
+                        pad.notifyDataSetChanged();
+                    }
                     break;
             }
         }

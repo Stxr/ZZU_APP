@@ -68,7 +68,12 @@ public class PassageAdapter extends RecyclerView.Adapter<PassageAdapter.ViewHold
         holder.tv_author.setText(myBBS.getAuthor().getUsername());
 //        holder.tv_createdTime.setText(myBBS.getCreatedAt());
         holder.tv_title.setText(myBBS.getTitle());
-        holder.tv_visit.setText("浏览 "+myBBS.getVisits()+" 次");
+        if (myBBS.getVisits() != null) {
+            holder.tv_visit.setText("浏览 "+myBBS.getVisits()+" 次");
+        }else{
+            holder.tv_visit.setText("浏览 "+0+" 次");
+        }
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             Date date = sdf.parse(myBBS.getCreatedAt());
