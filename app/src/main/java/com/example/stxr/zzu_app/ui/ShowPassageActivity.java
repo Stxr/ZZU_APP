@@ -18,10 +18,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.Scroller;
 import android.widget.TextView;
 
 import com.example.stxr.zzu_app.R;
@@ -74,6 +77,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
     private List<Comments> commentsList = new ArrayList<>();
     private Subscription subsLoading;
     private SwipeRefreshLayout srl_passage_refresh;
+    private ScrollView scrollView;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -118,6 +122,17 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                 srl_passage_refresh.setRefreshing(false);
             }
         });
+        //解决scrollView和SwipeRefreshLayout冲突问题
+        if (scrollView != null) {
+            scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+                @Override
+                public void onScrollChanged() {
+                    if (srl_passage_refresh != null) {
+                        srl_passage_refresh.setEnabled(scrollView.getScrollY() == 0);
+                    }
+                }
+            });
+        }
     }
 
     private void initView() {
@@ -135,6 +150,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         btn_comment_send.setOnClickListener(this);
         //解决RecycleView 和ScrollView嵌套时的卡的问题
         rv_showComments.setNestedScrollingEnabled(false);
+        scrollView = (ScrollView) findViewById(R.id.sv_content);
     }
 
     @Override

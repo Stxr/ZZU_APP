@@ -81,7 +81,11 @@ public class CommitAdapter extends RecyclerView.Adapter<CommitAdapter.CommitView
 
     @Override
     public int getItemCount() {
-        return commentsList.size();
+        if(commentsList!=null){
+            return commentsList.size();
+        }else{
+            return 0;
+        }
     }
 
     public class CommitViewHolder extends RecyclerView.ViewHolder {
