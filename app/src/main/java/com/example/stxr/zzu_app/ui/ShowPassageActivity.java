@@ -224,9 +224,6 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                 CommitAdapter commitAdapter = new CommitAdapter(ShowPassageActivity.this, list);
                 rv_showComments.setAdapter(commitAdapter);
                 Message message = new Message();
-//                Bundle bundle = new Bundle();
-//                bundle.putParcelableArrayList("comment", (ArrayList<? extends Parcelable>) list);
-//                message.setData(bundle);
                 message.what = 321;
                 message.obj = list;
                 handler.sendMessage(message);
@@ -338,41 +335,5 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                         }
                     }
                 });
-    }
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("ShowPassage Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
     }
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.stxr.zzu_app.test.TestActivity"
+    android:orientation="vertical"
+    >
+    <!--<com.sendtion.com.example.stxr.zzu_app.xrichtext.RichTextEditor-->
+        <!--android:id="@+id/et_new_content"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:textSize="16dp"-->
+        <!--android:textColor="@color/colorPrimaryText"/>-->
+    <Button
+        android:text="添加图片"
+        android:id="@+id/btn_add_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="显示数据"
+        android:id="@+id/btn_display"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="解析数据"
+        android:id="@+id/btn_translate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <com.example.stxr.zzu_app.xrichtext.RichTextEditor
+        android:id="@+id/redt_test"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        />
+
+</LinearLayout>

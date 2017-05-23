@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    <ImageView
+        android:src="@mipmap/ic_launcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <TextView
+        android:text="asdfadsfasdf "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+        <TextView
+            android:text="adsfadsfadsfadsf打发斯蒂芬阿的说法阿斯蒂芬阿斯蒂芬阿斯蒂芬阿的说法阿斯蒂芬阿斯蒂芬阿斯蒂芬阿的说法阿的说法阿的说法阿的说法阿的说法阿的说法阿斯蒂芬阿的说法阿的说法阿的说法阿的说法阿的说法阿的说法爱的发阿的说法阿斯蒂芬阿斯蒂芬阿的说法adsf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>

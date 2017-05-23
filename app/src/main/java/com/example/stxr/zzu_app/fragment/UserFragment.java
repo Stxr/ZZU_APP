@@ -142,26 +142,6 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         final MyUser user = BmobUser.getCurrentUser(MyUser.class);
         //先从本地读取照片，如果没有再从网上下载
         boolean is = UtilTools.getImageFromSD(getActivity(),user.getObjectId()+".jpg", profile_image);
-        //从网上下载
-//        if (!is) {
-//            BmobFile img = new BmobFile(user.getObjectId() + ".jpg",null, user.getImg().getUrl());
-//            final File savefile = new File(BMOB_IAMGE_CACHE, img.getFilename());
-//            img.download(savefile, new DownloadFileListener() {
-//                @Override
-//                public void done(String s, BmobException e) {
-//                    if (e == null) {
-//                        //T.shortShow(getActivity(), "下载成功，保存路径：" + s);
-//                        UtilTools.getImageFromSD(user.getObjectId()+".jpg", profile_image);
-//                    } else {
-//                        T.shortShow(getActivity(), "下载失败：" + e.getMessage());
-//                    }
-//                }
-//                @Override
-//                public void onProgress(Integer integer, long l) {
-//
-//                }
-//            });
-//        }
         dialog = new CustomDialog(getActivity(), 0, 0,
                 R.layout.dialog_photo, R.style.pop_anim_style, Gravity.BOTTOM, 0);
         //提示框以外点击无效

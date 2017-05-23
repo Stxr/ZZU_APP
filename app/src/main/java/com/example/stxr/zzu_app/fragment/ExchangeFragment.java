@@ -148,7 +148,10 @@ public class ExchangeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadMoreData(numsLoad);
+        if (pad != null) {
+            pad.notifyDataSetChanged();
+        }
+//        loadMoreData(10);
     }
 
     private void initView() {
