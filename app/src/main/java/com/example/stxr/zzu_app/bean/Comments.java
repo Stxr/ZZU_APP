@@ -1,5 +1,8 @@
 package com.example.stxr.zzu_app.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 
@@ -20,6 +23,8 @@ public class Comments extends BmobObject{
     private MyBBS post;
 
     private BmobFile img;
+
+    private List<Reply> replyList;
 
     public BmobFile getImg() {
         return img;
@@ -51,5 +56,17 @@ public class Comments extends BmobObject{
 
     public void setPost(MyBBS post) {
         this.post = post;
+    }
+
+    public List<Reply> getReplyList() {
+        if (replyList == null) {
+            replyList = new ArrayList<>();
+            return replyList;
+        }
+        return replyList;
+    }
+
+    public void setReplyList(List<Reply> replyList) {
+        this.replyList = replyList;
     }
 }

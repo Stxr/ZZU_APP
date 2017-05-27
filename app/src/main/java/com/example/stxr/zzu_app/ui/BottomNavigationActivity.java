@@ -8,11 +8,15 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -65,6 +69,9 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
     private UserFragment userFragment;
     private BadgeItem badgeItem;
     private FloatingActionButton fab;
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
+    private Toolbar toolbar;
     //退出的时间
     private long firstTime=0;
     @Override
@@ -74,21 +81,38 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
 //        course = new Course(getApplicationContext());
 //        course.onCreate();
         initView();
+        initData();
         initBottomNavBar();
         //测试登录
-        testData();
+//        testData();
     }
 
-    private void testData() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        try {
-            Date date1 = sdf.parse("20170428");
-            Date date2 = sdf.parse("20170528");
-            L.e(DataUtils.twoDateDistance(date1,date2));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+    private void initData() {
+        fab.setVisibility(View.GONE);
+        fab.setOnClickListener(this);
+        setSupportActionBar(toolbar);
+        //让toolbar产生汉堡菜单图标
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close
+        );
+        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
     }
+
+//    private void testData() {
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+//        try {
+//            Date date1 = sdf.parse("20170428");
+//            Date date2 = sdf.parse("20170528");
+//            L.e(DataUtils.twoDateDistance(date1,date2));
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void initBottomNavBar() {
         //设置模式
@@ -199,9 +223,10 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
     private void initView() {
         fab = (FloatingActionButton) findViewById(R.id.fab);
         bottom_nav_content = (LinearLayout) findViewById(R.id.bottom_nav_content);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         bottom_navigation_bar_container = (BottomNavigationBar) findViewById(R.id.bottom_navigation_bar_container);
-        fab.setVisibility(View.GONE);
-        fab.setOnClickListener(this);
     }
 
     @Override

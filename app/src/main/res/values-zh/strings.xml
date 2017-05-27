@@ -15,4 +15,6 @@
     <string name="title4">课程表</string>
     <string name="text_tost_empty">输入框不能为空</string>
     <string name="reset_successfully">重置成功</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
 </resources>

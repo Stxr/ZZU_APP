@@ -33,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        handler.sendEmptyMessageDelayed(StaticConstant.HANDLE_SPLASH, 2000);
+        handler.sendEmptyMessageDelayed(StaticConstant.HANDLE_SPLASH, 1000);
     }
 
     @Override

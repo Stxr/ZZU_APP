@@ -106,6 +106,12 @@ public class ExchangeFragment extends Fragment {
         //查询20条信息
         numsLoad = num;
         q.setLimit(num);
+//        boolean isCache = q.hasCachedResult(MyBBS.class);
+//        if(isCache){  //--此为举个例子，并不一定按这种方式来设置缓存策略
+//            q.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);    // 如果有缓存的话，则设置策略为CACHE_ELSE_NETWORK
+//        }else{
+//            q.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);    // 如果没有缓存的话，则设置策略为NETWORK_ELSE_CACHE
+//        }
         q.findObjects(new FindListener<MyBBS>() {
             @Override
             public void done(List<MyBBS> list, BmobException e) {
@@ -130,6 +136,12 @@ public class ExchangeFragment extends Fragment {
         q.setSkip(numsLoad);
         q.setLimit(numsLoad + num);
         numsLoad = numsLoad + num;
+//        boolean isCache = q.hasCachedResult(MyBBS.class);
+//        if(isCache){  //--此为举个例子，并不一定按这种方式来设置缓存策略
+//            q.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);    // 如果有缓存的话，则设置策略为CACHE_ELSE_NETWORK
+//        }else{
+//            q.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);    // 如果没有缓存的话，则设置策略为NETWORK_ELSE_CACHE
+//        }
         q.findObjects(new FindListener<MyBBS>() {
             @Override
             public void done(List<MyBBS> list, BmobException e) {
@@ -205,7 +217,7 @@ public class ExchangeFragment extends Fragment {
                                                 T.shortShow(getContext(), "删除成功");
                                                 showData(numsLoad);
                                             } else {
-                                                T.shortShow(getContext(), "删除失败");
+                                                T.shortShow(getContext(), "删除失败"+e.getMessage());
                                             }
                                         }
                                     });

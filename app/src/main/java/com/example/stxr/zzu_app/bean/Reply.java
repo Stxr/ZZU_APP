@@ -1,5 +1,7 @@
 package com.example.stxr.zzu_app.bean;
 
+import cn.bmob.v3.BmobObject;
+
 /*
  *  项目名：  ZZU_App
  *  包名：    com.example.stxr.zzu_app.bean
@@ -8,7 +10,7 @@ package com.example.stxr.zzu_app.bean;
  *  创建时间:  2017/5/24 0:22
  *  描述：    嵌套回复
  */
-public class Reply {
+public class Reply extends BmobObject{
     private String content; //回复内容
     private String  name; //回复的名字
     private String toName; //回复对象的名字

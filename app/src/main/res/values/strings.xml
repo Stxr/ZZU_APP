@@ -14,4 +14,8 @@
     <string name="text_two_input_not_consistent">两次输入密码不一致</string>
     <string name="reset_failed">重置失败</string>
     <string name="title4">课程表</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
+    <item name="reply" type="id"/>
+    <item name="replyParentPosition" type="id"/>
 </resources>

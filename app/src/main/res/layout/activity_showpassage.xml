@@ -9,7 +9,7 @@
         android:orientation="vertical">
 
 
-        <ScrollView
+        <android.support.v4.widget.NestedScrollView
             android:id="@+id/sv_content"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -57,7 +57,7 @@
                 <com.example.stxr.zzu_app.xrichtext.RichTextView
                     android:id="@+id/rtv_showContent"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:textSize="16sp" />
@@ -73,7 +73,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="Top commits" />
+                        android:text="评论" />
 
                     <View
                         android:layout_width="128dp"
@@ -97,10 +97,10 @@
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/rv_showComments"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="wrap_content" />
                 </android.support.design.widget.CoordinatorLayout>
             </LinearLayout>
-        </ScrollView>
+        </android.support.v4.widget.NestedScrollView >
 
         <TextView
             android:id="@+id/tv_showReply"

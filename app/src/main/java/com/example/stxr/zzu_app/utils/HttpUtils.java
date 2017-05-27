@@ -3,11 +3,17 @@ package com.example.stxr.zzu_app.utils;
 import android.os.Message;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -27,8 +33,27 @@ public class HttpUtils {
     public static OkHttpClient getInstance() {
         if (client == null) {
             synchronized (HttpUtils.class) {
-                if (client == null)
-                    client = new OkHttpClient();
+                if (client == null){
+                    client = new OkHttpClient.Builder().cookieJar(new CookieJar() {
+                        private final HashMap<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
+                        @Override
+                        public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
+                            cookieStore.put(httpUrl.host(), list);
+                        }
+
+                        @Override
+                        public List<Cookie> loadForRequest(HttpUrl httpUrl) {
+                            List<Cookie> cookies = cookieStore.get(httpUrl.host());
+                            if (cookies != null) {
+                                return cookies;
+                            } else {
+                                return new ArrayList<>();
+                            }
+//                            return cookies != null ? cookies : new ArrayList<>();
+                        }
+                    }).build();
+                }
+
             }
         }
         return client;

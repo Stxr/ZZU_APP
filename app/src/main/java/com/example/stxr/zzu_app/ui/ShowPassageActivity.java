@@ -7,13 +7,11 @@ package com.example.stxr.zzu_app.ui;/*
  *  描述：    
  */
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -23,29 +21,26 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Scroller;
 import android.widget.TextView;
 
 import com.example.stxr.zzu_app.R;
 import com.example.stxr.zzu_app.adapter.CommitAdapter;
+import com.example.stxr.zzu_app.adapter.ReplyAdapter;
 import com.example.stxr.zzu_app.bean.Comments;
 import com.example.stxr.zzu_app.bean.MyBBS;
 import com.example.stxr.zzu_app.bean.MyUser;
+import com.example.stxr.zzu_app.bean.Reply;
 import com.example.stxr.zzu_app.utils.L;
 import com.example.stxr.zzu_app.utils.ShareUtils;
 import com.example.stxr.zzu_app.utils.StringUtils;
 import com.example.stxr.zzu_app.utils.T;
 import com.example.stxr.zzu_app.xrichtext.RichTextView;
 import com.example.stxr.zzu_app.xrichtext.SDCardUtil;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
@@ -55,7 +50,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.DownloadFileListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
-import me.iwf.photopicker.PhotoPicker;
+import cn.bmob.v3.listener.UpdateListener;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
@@ -75,14 +70,68 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
     private TextView tv_creatTime;
     private TextView tv_author;
     private List<Comments> commentsList = new ArrayList<>();
+    private List<Reply> replies;
     private Subscription subsLoading;
     private SwipeRefreshLayout srl_passage_refresh;
-    private ScrollView scrollView;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private NestedScrollView scrollView;
+    private View.OnClickListener replyCommentsListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int position = (Integer) v.getTag();
+//            T.shortShow(ShowPassageActivity.this, "点击了回复" + commentsList.get(position).getObjectId());
+        }
+    };
+    private ReplyAdapter.OnRecyclerViewItemClickListener itemClickListener = new ReplyAdapter.OnRecyclerViewItemClickListener() {
+
+        @Override
+        public void onItemClick(View view, final Reply reply) {
+            final int parentPosition = (Integer) view.getTag(R.id.replyParentPosition);
+            final Comments comments = commentsList.get(parentPosition);
+            if(!Objects.equals(reply.getName(), BmobUser.getCurrentUser(MyUser.class).getUsername())){ //不能回复自己
+                tv_showReply.setVisibility(View.GONE);
+                ll_comment_send.setVisibility(View.VISIBLE);
+                btn_comment_send.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String text = edt_comment.getText().toString().trim();
+//                    T.shortShow(ShowPassageActivity.this, "回复的内容是" + reply.getContent()+"父位置id是"+comments.getObjectId());
+                        if (!TextUtils.isEmpty(text)) {
+                            Reply r = new Reply();
+                            r.setContent(text);
+                            r.setName(BmobUser.getCurrentUser(MyUser.class).getUsername());
+                            r.setToName(reply.getName());
+                            comments.getReplyList().add(r);
+                            comments.update(new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if (e == null) {
+                                        T.shortShow(ShowPassageActivity.this, "评论回复成功");
+                                    } else {
+                                        T.shortShow(ShowPassageActivity.this, "评论回复失败"+e.getMessage());
+                                    }
+                                }
+                            });
+                            //恢复成原来的样子
+                            edt_comment.setText("");
+                            tv_showReply.setVisibility(View.VISIBLE);
+                            ll_comment_send.setVisibility(View.GONE);
+                            //显示
+                            LinearLayoutManager layout = new LinearLayoutManager(ShowPassageActivity.this);
+                            rv_showComments.setLayoutManager(layout);
+                            CommitAdapter commitAdapter = new CommitAdapter(ShowPassageActivity.this, commentsList, ShowPassageActivity.this, itemClickListener);
+                            rv_showComments.setAdapter(commitAdapter);
+                            //隐藏输入框
+                            InputMethodManager imm = (InputMethodManager) getSystemService(ShowPassageActivity.INPUT_METHOD_SERVICE);
+                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                        } else {
+                            L.i("回复不能为空");
+                            T.shortShow(ShowPassageActivity.this, "回复内容不能为空");
+                        }
+                    }
+                });
+            }
+        }
+    };
 
     @Override
 
@@ -92,9 +141,6 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         initView();
         initData();
         downloadComment();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void initData() {
@@ -147,41 +193,98 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         btn_comment_send = (Button) findViewById(R.id.btn_comment_send);
         edt_comment = (EditText) findViewById(R.id.edt_comment);
         tv_showReply.setOnClickListener(this);
-        btn_comment_send.setOnClickListener(this);
         //解决RecycleView 和ScrollView嵌套时的卡的问题
         rv_showComments.setNestedScrollingEnabled(false);
-        scrollView = (ScrollView) findViewById(R.id.sv_content);
+        scrollView = (NestedScrollView) findViewById(R.id.sv_content);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             //评论回复
+            case R.id.tv_reply:
+                int position = (Integer) v.getTag();
+//                T.shortShow(ShowPassageActivity.this, "点击了回复" + commentsList.get(position).getObjectId());
+                reply(position);
+                break;
+            //帖子回复
             case R.id.tv_showReply:
                 //显示回复的输入框
-                tv_showReply.setVisibility(View.GONE);
-                ll_comment_send.setVisibility(View.VISIBLE);
-                break;
-            //发送回复
-            case R.id.btn_comment_send:
-                String text = edt_comment.getText().toString().trim();
-                Comments comments = new Comments();
-                //如果输入的不为空
-                if (!TextUtils.isEmpty(text)) {
-                    showComment(commit(text));
-                    //恢复成原来的样子
-                    edt_comment.setText("");
-                    tv_showReply.setVisibility(View.VISIBLE);
-                    ll_comment_send.setVisibility(View.GONE);
-                    //隐藏输入框
-                    InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
-                    imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-                } else {
-                    L.i("回复不能为空");
-                    T.shortShow(this, "回复内容不能为空");
-                }
+                reply(-1);
                 break;
         }
+    }
+
+    private void reply(final int position) {
+        //显示回复文本框
+        tv_showReply.setVisibility(View.GONE);
+        ll_comment_send.setVisibility(View.VISIBLE);
+
+        btn_comment_send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = edt_comment.getText().toString().trim();
+                Comments comments = new Comments();
+                switch (position) {
+                    //回复的是帖子
+                    case -1:
+                        //如果输入的不为空
+                        if (!TextUtils.isEmpty(text)) {
+                            //添加并上传评论
+                            showComment(commit(text));
+                            //恢复成原来的样子
+                            edt_comment.setText("");
+                            tv_showReply.setVisibility(View.VISIBLE);
+                            ll_comment_send.setVisibility(View.GONE);
+                            //隐藏输入框
+                            InputMethodManager imm = (InputMethodManager) getSystemService(ShowPassageActivity.INPUT_METHOD_SERVICE);
+                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                        } else {
+                            L.i("回复不能为空");
+                            T.shortShow(ShowPassageActivity.this, "回复内容不能为空");
+                        }
+                        break;
+                    //回复的是回复帖子的回复
+                    default:
+                        if (!TextUtils.isEmpty(text)) {
+                            Reply reply = new Reply();
+                            Comments c = commentsList.get(position);
+                            MyUser user = BmobUser.getCurrentUser(MyUser.class);
+                            reply.setName(user.getUsername());
+                            reply.setToName(" ");
+                            reply.setContent(text);
+                            c.getReplyList().add(reply);
+                            c.update(new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if (e == null) {
+                                        T.shortShow(ShowPassageActivity.this,"评论发表成功");
+                                    }else{
+                                        T.shortShow(ShowPassageActivity.this,"评论发表失败"+e.getMessage());
+                                    }
+                                }
+                            });
+                            //恢复成原来的样子
+                            edt_comment.setText("");
+                            tv_showReply.setVisibility(View.VISIBLE);
+                            ll_comment_send.setVisibility(View.GONE);
+                            //显示
+                            LinearLayoutManager layout = new LinearLayoutManager(ShowPassageActivity.this);
+                            rv_showComments.setLayoutManager(layout);
+                            CommitAdapter commitAdapter = new CommitAdapter(ShowPassageActivity.this, commentsList, ShowPassageActivity.this, itemClickListener);
+
+                            rv_showComments.setAdapter(commitAdapter);
+                            //隐藏输入框
+                            InputMethodManager imm = (InputMethodManager) getSystemService(ShowPassageActivity.INPUT_METHOD_SERVICE);
+                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                        } else {
+                            L.i("回复不能为空");
+                            T.shortShow(ShowPassageActivity.this, "回复内容不能为空");
+                        }
+                        break;
+                }
+            }
+        });
     }
 
     //上传回复的数据
@@ -190,6 +293,18 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         MyBBS post = new MyBBS();
         post.setObjectId(getIntent().getStringExtra("ObjectID"));
         Comments comments = new Comments();
+//        List<Reply> replies = new ArrayList<>();
+//        Reply reply = new Reply();
+//        Reply reply1 = new Reply();
+//        reply.setContent("这是一条嵌套回复");
+//        reply.setName("1234");
+//        reply.setToName("小螃蟹");
+//        reply1.setContent("这是二条嵌套回复");
+//        reply1.setName("4321");
+//        reply1.setToName("大螃蟹");
+//        replies.add(reply);
+//        replies.add(reply1);
+//        comments.setReplyList(replies);
         comments.setAuthor(user);
         comments.setContents(text);
         comments.setPost(post);
@@ -215,7 +330,8 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
 //        layout.setStackFromEnd(true);//列表再底部开始展示，反转后由上面开始展示
 //        layout.setReverseLayout(true);//列表翻转
         rv_showComments.setLayoutManager(layout);
-        CommitAdapter commitAdapter = new CommitAdapter(this, commentsList);
+        CommitAdapter commitAdapter = new CommitAdapter(this, commentsList, this, itemClickListener);
+
         rv_showComments.setAdapter(commitAdapter);
     }
 
@@ -230,6 +346,12 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         query.addWhereEqualTo("post", new BmobPointer(post));
         //查询发评论的作者和帖子的作者
         query.include("author,post.author");
+//        boolean isCache = query.hasCachedResult(Comments.class);
+//        if(isCache){ //--此为举个例子，并不一定按这种方式来设置缓存策略
+//            query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);    // 如果有缓存的话，则设置策略为CACHE_ELSE_NETWORK
+//        }else{
+//            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);    // 如果没有缓存的话，则设置策略为NETWORK_ELSE_CACHE
+//        }
         query.findObjects(new FindListener<Comments>() {
             @Override
             public void done(List<Comments> list, BmobException e) {
@@ -237,7 +359,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
 //                layout.setStackFromEnd(true);//列表再底部开始展示，反转后由上面开始展示
 //                layout.setReverseLayout(true);//列表翻转
                 rv_showComments.setLayoutManager(layout);
-                CommitAdapter commitAdapter = new CommitAdapter(ShowPassageActivity.this, list);
+                CommitAdapter commitAdapter = new CommitAdapter(ShowPassageActivity.this, list, ShowPassageActivity.this, itemClickListener);
                 rv_showComments.setAdapter(commitAdapter);
                 Message message = new Message();
                 message.what = 321;
@@ -255,7 +377,9 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
             switch (msg.what) {
                 case 321:
                     List<Comments> list = (List<Comments>) msg.obj;
-                    commentsList.addAll(list);
+                    if (commentsList != null && list != null) {
+                        commentsList.addAll(list);
+                    }
                     break;
             }
         }
