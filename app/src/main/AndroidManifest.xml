@@ -21,6 +21,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- SD卡读取权限，用户写入离线定位数据-->
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <!--PhotoPick用-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <application
         android:name=".application.BaseApplication"
         android:allowBackup="true"
@@ -42,6 +44,13 @@
             android:theme="@style/NoActionBarFullscreen"
             android:name="me.iwf.photopicker.PhotoPickerActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.InfoChangeActivity"
+            android:label="我的资料"
+            android:screenOrientation="portrait"/>
+        <!--修改昵称-->
+        <activity android:name=".ui.ChangeNameAcitvity"
+            android:label="修改昵称"
+            android:screenOrientation="portrait"/>
         <!--考试倒计时-->
         <activity android:name=".ui.CountDownActivity"
             android:label="考试倒计时"
@@ -55,10 +64,10 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
         <!--绑定账号的界面-->
         <activity android:name=".ui.BindActivity"
@@ -96,10 +105,10 @@
             android:name=".ui.SplashActivity"
             android:theme="@style/NoActivityFullscreen"
             android:screenOrientation="portrait">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"

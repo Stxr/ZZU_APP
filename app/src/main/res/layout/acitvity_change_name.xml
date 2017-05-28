@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <com.wrapp.floatlabelededittext.FloatLabeledEditText
+        android:id="@+id/fe_set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <EditText
+        android:id="@+id/et_change_name"
+        android:hint="要修改的昵称"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+</LinearLayout>

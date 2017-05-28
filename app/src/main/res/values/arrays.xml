@@ -59,4 +59,20 @@
         <item>30</item>
         <item>31</item>
     </string-array>
+    <string-array name="weekday" translatable="false">
+        <item>星期一</item>
+        <item>星期二</item>
+        <item>星期三</item>
+        <item>星期四</item>
+        <item>星期五</item>
+        <item>星期六</item>
+        <item>星期日</item>
+    </string-array>
+    <string-array name="classTime" translatable="false">
+        <item>上午第1-2节</item>
+        <item>上午第3-4节</item>
+        <item>下午第5-6节</item>
+        <item>下午第7-8节</item>
+        <item>晚上第9-10节</item>
+    </string-array>
 </resources>

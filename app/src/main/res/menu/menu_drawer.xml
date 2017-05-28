@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_blog"
-            android:title="我的博客" />
-        <item
-            android:id="@+id/nav_about"
-            android:title="关于我" />
-
-        <item
-            android:id="@+id/nav_version"
-            android:title="版本信息" />
-    </group>
-
-    <item android:title="Sub Title">
+    <item
+        android:title="个人信息"
+        android:visible="true">
         <menu>
             <item
-                android:id="@+id/nav_sub1"
-                android:title="副标题1"
-                android:checkable="true"/>
+                android:id="@+id/nav_sex"
+                android:checkable="true"
+                android:title="性别：男" />
             <item
-                android:id="@+id/nav_sub2"
-                android:title="副标题2"
-                android:checkable="true"/>
+                android:id="@+id/nav_info"
+                android:checkable="true"
+                android:title="院系：信息工程学院" />
         </menu>
     </item>
+    <item
+        android:title="设置"
+        android:visible="true">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_bind"
+                    android:title="教务处账号绑定" />
+                <item
+                    android:id="@+id/nav_infoChange"
+                    android:title="资料更改" />
+
+                <item
+                    android:id="@+id/nav_countDown"
+                    android:title="考试倒计时" />
+            </group>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/nav_switch"
+        android:title="切换账号"></item>
+
+
 </menu>

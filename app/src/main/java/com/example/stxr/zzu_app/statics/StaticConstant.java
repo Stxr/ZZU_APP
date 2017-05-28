@@ -14,6 +14,13 @@ import java.util.Map;
  *  描述：     一些静态的全局常量
  */
 public class StaticConstant {
+    public static final int COUNTDOWN_REQUEST_CODE = 122;
+    public static final int INFO_CHAGNE_CODE = 11;
+    public static final int SET_NAME_CODE = 21;
+    public static final int SET_NAME_BACK_CODE = 22;
+    public static final int SET_SPECIALITY_CODE = 23;
+    public static final int SET_SPECIALITY_BACK_CODE = 24;
+    public static final int GET_ZOOM_PHOTO = 25;
     public static final String BMOB_IAMGE_CACHE = Environment.getExternalStorageDirectory().getPath()+"/zzu_app/";
     public static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 779;
     //闪屏页的延时标志

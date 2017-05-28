@@ -1,6 +1,8 @@
 package com.example.stxr.zzu_app.bean;
 
 
+import java.util.List;
+
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 
@@ -16,7 +18,7 @@ public class MyBBS extends BmobObject {
     private String title;//帖子的标题
     private MyUser author;//发帖的作者
     private String content; //发帖的内容
-    private BmobFile pic;
+    private List<BmobFile> picList;
     private Integer visits;
 
     public MyUser getAuthor() {
@@ -50,11 +52,11 @@ public class MyBBS extends BmobObject {
         this.visits = visits;
     }
 
-    public BmobFile getPic() {
-        return pic;
+    public List<BmobFile> getPicList() {
+        return picList;
     }
 
-    public void setPic(BmobFile pic) {
-        this.pic = pic;
+    public void setPicList(List<BmobFile> picList) {
+        this.picList = picList;
     }
 }

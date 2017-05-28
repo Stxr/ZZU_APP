@@ -3,6 +3,8 @@ package com.example.stxr.zzu_app.ui;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -98,7 +100,7 @@ public class PassageActivity extends BaseActivity {
      */
     private void savePassageData() {
         String title = edt_title.getText().toString().trim();
-        String content = getEditData();;
+        String content = getEditData();
         MyUser author = BmobUser.getCurrentUser(MyUser.class);
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(content)){
             MyBBS myBBS = new MyBBS();
@@ -130,9 +132,6 @@ public class PassageActivity extends BaseActivity {
     private String getEditData() {
         List<RichTextEditor.EditData> editDataList = redt_content.buildEditData();
         StringBuffer content = new StringBuffer();
-        MyUser author = BmobUser.getCurrentUser(MyUser.class);
-        String title = edt_title.getText().toString().trim();
-        final MyBBS myBBS = new MyBBS();
         for (RichTextEditor.EditData itemData : editDataList) {
             if (itemData.inputStr != null) {
                 content.append(itemData.inputStr);
@@ -144,6 +143,7 @@ public class PassageActivity extends BaseActivity {
                         if (e == null) {
                             //保存文件
                             ShareUtils.putString(PassageActivity.this, image.getFilename(), image.getUrl());
+
                             T.shortShow(PassageActivity.this, "图片上传成功");
                         } else {
                             T.shortShow(PassageActivity.this, "图片上传失败:" + e.getMessage());
@@ -155,6 +155,17 @@ public class PassageActivity extends BaseActivity {
         }
         return content.toString();
     }
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            MyUser author = BmobUser.getCurrentUser(MyUser.class);
+            String title = edt_title.getText().toString().trim();
+            final MyBBS myBBS = new MyBBS();
+
+        }
+    };
     private void callGallery() {
         //调用第三方图库选择
         PhotoPicker.builder()
