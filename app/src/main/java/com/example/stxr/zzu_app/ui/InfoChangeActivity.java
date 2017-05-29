@@ -7,12 +7,14 @@ package com.example.stxr.zzu_app.ui;/*
  *  描述：    资料更改
  */
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,7 +69,8 @@ public class InfoChangeActivity extends BaseActivity implements View.OnClickList
         ll_profile.setOnClickListener(this);
         ll_name.setOnClickListener(this);
         ll_speciality.setOnClickListener(this);
-        ll_profile.setOnClickListener(this);
+        ll_sex.setOnClickListener(this);
+
         tv_speciality.setText(getIntent().getStringExtra("speciality"));
         tv_name.setText(getIntent().getStringExtra("name"));
         tv_sex.setText(getIntent().getStringExtra("sex"));
@@ -103,6 +106,7 @@ public class InfoChangeActivity extends BaseActivity implements View.OnClickList
                 break;
             //性别
             case R.id.ll_sex:
+                sexSelected();
                 break;
             //专业
             case R.id.ll_userSpeciality:
@@ -113,6 +117,29 @@ public class InfoChangeActivity extends BaseActivity implements View.OnClickList
                 break;
 
         }
+    }
+
+    private void sexSelected() {
+        //选择默认选中的框
+        int select = tv_sex.getText().toString().trim().equals("男")?0:1;
+        new AlertDialog.Builder(this).setSingleChoiceItems(
+                new String[]{"男", "女"}, select, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        tv_sex.setText(which==0?"男":"女");
+                        MyUser user = new MyUser();
+                        user.setSex(which==0);
+                        updataUser(user);
+                        dialog.dismiss();
+                    }
+                }).create().show();
+//        AlertDialog.Builder builder = new AlertDialog.Builder(InfoChangeActivity.this);
+//        builder.setTitle("提示");
+//        builder.setMessage("确定删除此帖？");
+//        builder.setCancelable(false);
+//        builder.setNegativeButton("取消", null);
+//        builder.setPositiveButton("确定", null);
+//        builder.create().show();
     }
 
     private void callGallery() {

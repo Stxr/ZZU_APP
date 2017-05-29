@@ -31,6 +31,7 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
 import me.iwf.photopicker.PhotoPicker;
 import rx.Observable;
@@ -55,6 +56,10 @@ public class PassageActivity extends BaseActivity {
     private RichTextEditor redt_content;
     private Subscription subsLoading;
     private Subscription subsInsert;
+    private List<BmobFile> bmobFiles = new ArrayList<>();
+    private MyBBS bbs;
+    //发送完成的标志位
+    private int flag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,17 +107,21 @@ public class PassageActivity extends BaseActivity {
         String title = edt_title.getText().toString().trim();
         String content = getEditData();
         MyUser author = BmobUser.getCurrentUser(MyUser.class);
-        if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(content)){
-            MyBBS myBBS = new MyBBS();
+        if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(content)) {
+            final MyBBS myBBS = new MyBBS();
             myBBS.setContent(content);
             myBBS.setTitle(title);
             myBBS.setAuthor(author);
-            myBBS.increment("visits",0);
+            myBBS.increment("visits", 0);
             myBBS.save(new SaveListener<String>() {
                 @Override
                 public void done(String s, BmobException e) {
                     if (e == null) {
-                        T.shortShow(PassageActivity.this, "上传数据成功");
+//                        T.shortShow(PassageActivity.this, "上传数据成功");
+                        bbs = myBBS;
+                        Message msg = new Message();
+                        msg.what = 123;
+                        handler.sendMessage(msg);
                     } else {
                         T.shortShow(PassageActivity.this, "上传数据失败" + e.getMessage());
                     }
@@ -120,10 +129,11 @@ public class PassageActivity extends BaseActivity {
             });
             setResult(2);
             finish();
-        }else {
+        } else {
             T.shortShow(this, "标题或内容不能为空");
         }
     }
+
     /**
      * 获取数据，保存到数据库做准备
      *
@@ -132,19 +142,34 @@ public class PassageActivity extends BaseActivity {
     private String getEditData() {
         List<RichTextEditor.EditData> editDataList = redt_content.buildEditData();
         StringBuffer content = new StringBuffer();
+        int sum = 0;
+        for (RichTextEditor.EditData editData : editDataList) {
+            if (editData.imagePath != null) {
+                sum++;
+            }
+        }
         for (RichTextEditor.EditData itemData : editDataList) {
             if (itemData.inputStr != null) {
                 content.append(itemData.inputStr);
             } else if (itemData.imagePath != null) {
+                sum--;
                 final BmobFile image = new BmobFile(new File(itemData.imagePath));
+                bmobFiles.add(image);
+                final int finalSum = sum;
                 image.uploadblock(new UploadFileListener() {
                     @Override
                     public void done(BmobException e) {
                         if (e == null) {
                             //保存文件
-                            ShareUtils.putString(PassageActivity.this, image.getFilename(), image.getUrl());
+//                            ShareUtils.putString(PassageActivity.this, image.getFilename(), image.getUrl());
+                            if (finalSum == 0) {
+                                Message msg = new Message();
+                                msg.what = 123;
+                                msg.obj = image;
+                                handler.sendMessage(msg);
+                            }
 
-                            T.shortShow(PassageActivity.this, "图片上传成功");
+//                            T.shortShow(PassageActivity.this, "图片上传成功");
                         } else {
                             T.shortShow(PassageActivity.this, "图片上传失败:" + e.getMessage());
                         }
@@ -156,16 +181,40 @@ public class PassageActivity extends BaseActivity {
         return content.toString();
     }
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            MyUser author = BmobUser.getCurrentUser(MyUser.class);
-            String title = edt_title.getText().toString().trim();
-            final MyBBS myBBS = new MyBBS();
+            switch (msg.what) {
+                //图片上传成功
+                case 123:
+                    flag++;
+//                    BmobFile file = (BmobFile) msg.obj;
+//                    bmobFiles.add(file);
+                    if (flag == 2) {
+                        flag = 0;
+                        bbs.setPicList(bmobFiles);
+                        bbs.update(new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if (e == null) {
+//                                T.shortShow(PassageActivity.this,"更新成功111");
+                                } else {
+                                    T.shortShow(PassageActivity.this, "更新失败" + e.getMessage());
+                                    L.e("更新失败" + e.getMessage());
+                                }
+                            }
+                        });
+                    }
+//                    MyUser author = BmobUser.getCurrentUser(MyUser.class);
+//                    String title = edt_title.getText().toString().trim();
+//                    final MyBBS myBBS = new MyBBS();
+                    break;
+            }
 
         }
     };
+
     private void callGallery() {
         //调用第三方图库选择
         PhotoPicker.builder()
@@ -175,6 +224,7 @@ public class PassageActivity extends BaseActivity {
                 .setPreviewEnabled(true)//是否可以预览
                 .start(this, PhotoPicker.REQUEST_CODE);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -189,6 +239,7 @@ public class PassageActivity extends BaseActivity {
             }
         }
     }
+
     /**
      * 异步方式插入图片
      * 插入图片的同时，将图片压缩保存为sd卡指定目录，到要取的时候才取出来
@@ -235,6 +286,7 @@ public class PassageActivity extends BaseActivity {
 //                        insertDialog.dismiss();
                         L.e("图片插入失败:" + e.getMessage());
                     }
+
                     @Override
                     public void onNext(String imagePath) {
                         redt_content.insertImage(imagePath, redt_content.getMeasuredWidth());

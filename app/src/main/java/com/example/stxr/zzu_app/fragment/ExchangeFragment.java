@@ -196,7 +196,7 @@ public class ExchangeFragment extends Fragment {
 
                                 }
                             });
-                            startActivity(intent);
+                            startActivityForResult(intent,52);
                         }
                     });
                     pad.setOnItemLongClickListener(new PassageAdapter.OnRecyclerViewItemLongClickListener() {
@@ -237,4 +237,14 @@ public class ExchangeFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 52:
+//                showData(10);
+                break;
+
+        }
+    }
 }

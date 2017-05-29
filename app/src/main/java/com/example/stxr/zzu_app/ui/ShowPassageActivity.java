@@ -15,6 +15,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
@@ -34,6 +35,7 @@ import com.example.stxr.zzu_app.utils.L;
 import com.example.stxr.zzu_app.utils.ShareUtils;
 import com.example.stxr.zzu_app.utils.StringUtils;
 import com.example.stxr.zzu_app.utils.T;
+import com.example.stxr.zzu_app.view.CustomDialog;
 import com.example.stxr.zzu_app.xrichtext.RichTextView;
 import com.example.stxr.zzu_app.xrichtext.SDCardUtil;
 
@@ -49,6 +51,7 @@ import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.DownloadFileListener;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import rx.Observable;
@@ -74,6 +77,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
     private Subscription subsLoading;
     private SwipeRefreshLayout srl_passage_refresh;
     private NestedScrollView scrollView;
+    private CustomDialog dialog;
     private View.OnClickListener replyCommentsListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -87,7 +91,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         public void onItemClick(View view, final Reply reply) {
             final int parentPosition = (Integer) view.getTag(R.id.replyParentPosition);
             final Comments comments = commentsList.get(parentPosition);
-            if(!Objects.equals(reply.getName(), BmobUser.getCurrentUser(MyUser.class).getUsername())){ //不能回复自己
+            if (!Objects.equals(reply.getName(), BmobUser.getCurrentUser(MyUser.class).getUsername())) { //不能回复自己
                 tv_showReply.setVisibility(View.GONE);
                 ll_comment_send.setVisibility(View.VISIBLE);
                 btn_comment_send.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +111,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                                     if (e == null) {
                                         T.shortShow(ShowPassageActivity.this, "评论回复成功");
                                     } else {
-                                        T.shortShow(ShowPassageActivity.this, "评论回复失败"+e.getMessage());
+                                        T.shortShow(ShowPassageActivity.this, "评论回复失败" + e.getMessage());
                                     }
                                 }
                             });
@@ -144,27 +148,17 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void initData() {
+        dialog = new CustomDialog(this, 100, 100, R.layout.dialog_loding, R.style.Theme_dialog, Gravity.CENTER, R.style.pop_anim_style);
+        dialog.setCancelable(false);
         tv_showTitle.setText(getIntent().getStringExtra("title"));
         tv_author.setText(getIntent().getStringExtra("username"));
         tv_creatTime.setText(getIntent().getStringExtra("createdTime"));
-        rtv_showContent.post(new Runnable() {
-            @Override
-            public void run() {
-                rtv_showContent.clearAllLayout();
-                showDataSync(getIntent().getStringExtra("content"));
-            }
-        });
+        updataPassage();
         //下拉刷新
         srl_passage_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                rtv_showContent.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        rtv_showContent.clearAllLayout();
-                        showDataSync(getIntent().getStringExtra("content"));
-                    }
-                });
+                updataPassage();
                 srl_passage_refresh.setRefreshing(false);
             }
         });
@@ -179,6 +173,20 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                 }
             });
         }
+
+    }
+
+    private void updataPassage() {
+        dialog.show();
+        rtv_showContent.post(new Runnable() {
+            @Override
+            public void run() {
+                rtv_showContent.clearAllLayout();
+                showDataSync(getIntent().getStringExtra("content"));
+                dialog.dismiss();
+            }
+        });
+
     }
 
     private void initView() {
@@ -258,9 +266,9 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                                 @Override
                                 public void done(BmobException e) {
                                     if (e == null) {
-                                        T.shortShow(ShowPassageActivity.this,"评论发表成功");
-                                    }else{
-                                        T.shortShow(ShowPassageActivity.this,"评论发表失败"+e.getMessage());
+                                        T.shortShow(ShowPassageActivity.this, "评论发表成功");
+                                    } else {
+                                        T.shortShow(ShowPassageActivity.this, "评论发表失败" + e.getMessage());
                                     }
                                 }
                             });
@@ -293,18 +301,6 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         MyBBS post = new MyBBS();
         post.setObjectId(getIntent().getStringExtra("ObjectID"));
         Comments comments = new Comments();
-//        List<Reply> replies = new ArrayList<>();
-//        Reply reply = new Reply();
-//        Reply reply1 = new Reply();
-//        reply.setContent("这是一条嵌套回复");
-//        reply.setName("1234");
-//        reply.setToName("小螃蟹");
-//        reply1.setContent("这是二条嵌套回复");
-//        reply1.setName("4321");
-//        reply1.setToName("大螃蟹");
-//        replies.add(reply);
-//        replies.add(reply1);
-//        comments.setReplyList(replies);
         comments.setAuthor(user);
         comments.setContents(text);
         comments.setPost(post);
@@ -381,6 +377,11 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                         commentsList.addAll(list);
                     }
                     break;
+                case 111:
+                    updataPassage();
+                    dialog.dismiss();
+                    break;
+
             }
         }
     };
@@ -399,30 +400,66 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                 L.e("text" + text);
                 if (text.contains("<img")) {
                     final String imagePath = StringUtils.getImgSrc(text);
-                    String fileName = StringUtils.getFileName(imagePath) + ".txr";
-                    String fileUrl = ShareUtils.getString(ShowPassageActivity.this, fileName, null);
+                    final String fileName = StringUtils.getFileName(imagePath) + ".txr";
+//                    String fileUrl = ShareUtils.getString(ShowPassageActivity.this, fileName, null);
                     if (new File(imagePath).exists()) {
                         subscriber.onNext(imagePath);
                     } else {
-                        BmobFile file = new BmobFile(fileName, "", fileUrl);
-                        file.download(new File(imagePath), new DownloadFileListener() {
+                        final BmobQuery<MyBBS> bbsquery = new BmobQuery<>();
+                        bbsquery.getObject(getIntent().getStringExtra("ObjectID"), new QueryListener<MyBBS>() {
                             @Override
-                            public void done(String s, BmobException e) {
+                            public void done(MyBBS myBBS, BmobException e) {
                                 if (e == null) {
-                                    T.shortShow(ShowPassageActivity.this, "下载成功");
-                                    L.e("下载路径：" + s);
-//                                    subscriber.onNext(s);
-                                    //  showEditData(subscriber,html);
-                                } else {
-                                    T.shortShow(ShowPassageActivity.this, "下载失败");
+                                    final List<BmobFile> bmobFiles = myBBS.getPicList();
+                                    for (final BmobFile file : bmobFiles) {
+                                        if (imagePath.contains(file.getFilename())) {
+                                            file.download(new File(imagePath), new DownloadFileListener() {
+                                                @Override
+                                                public void done(String s, BmobException e) {
+                                                    if (e == null) {
+                                                        if (file.equals(bmobFiles.get(bmobFiles.size() - 1))) {
+                                                            handler.sendEmptyMessageDelayed(111,100);
+
+                                                        }
+                                                    } else {
+                                                        T.shortShow(ShowPassageActivity.this, "下载失败");
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onProgress(Integer integer, long l) {
+
+                                                }
+                                            });
+                                        }
+
+
+                                    }
                                 }
                             }
-
-                            @Override
-                            public void onProgress(Integer integer, long l) {
-
-                            }
                         });
+//                        MyBBS myBBS = new MyBBS();
+//                        myBBS.setObjectId(getIntent().getStringExtra("ObjectID"));
+//
+//                        BmobFile file = new BmobFile(fileName, "", fileUrl);
+//                        file.download(new File(imagePath), new DownloadFileListener() {
+//                            @Override
+//                            public void done(String s, BmobException e) {
+//                                if (e == null) {
+//                                    T.shortShow(ShowPassageActivity.this, "下载成功");
+//                                    L.e("下载路径：" + s);
+////                                    subscriber.onNext(s);
+//                                    //  showEditData(subscriber,html);
+//                                } else {
+//                                    T.shortShow(ShowPassageActivity.this, "下载失败");
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onProgress(Integer integer, long l) {
+//
+//                            }
+//                        });
 //                        subscriber.onNext(imagePath);
                     }
                 } else {
@@ -442,6 +479,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
      * @param html
      */
     private void showDataSync(final String html) {
+//        dialog.show();
 //        loadingDialog.show();
 
         subsLoading = Observable.create(new Observable.OnSubscribe<String>() {
@@ -457,13 +495,15 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                     @Override
                     public void onCompleted() {
 //                        loadingDialog.dismiss();
+//                        dialog.dismiss();
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        dialog.dismiss();
 //                        loadingDialog.dismiss();
                         e.printStackTrace();
-                        T.shortShow(ShowPassageActivity.this, "解析错误：图片不存在或已损坏");
+                        T.shortShow(ShowPassageActivity.this, "图片不存在或已损坏，请刷新重试");
                     }
 
                     @Override
