@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:textColor="@color/colorPrimaryText"
+        android:padding="8dp"
+        android:hint="微积分"
+        android:id="@+id/tv_widgetItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:alpha="0.1"
+        android:background="@color/colorAccent"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+</LinearLayout>

@@ -8,4 +8,6 @@
     <color name="colorSecondaryText">#757575</color>
     <color name="colorDivider">#BDBDBD</color>
     <color name="colorPrimaryText">#212121</color>
+    <color name="window_background">#FFF5F5F5</color>
+    <color name="tab_bgcolor">#eeeeee</color>
 </resources>

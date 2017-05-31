@@ -39,16 +39,20 @@
                 </action>
             </intent-filter>
         </service>
-
+        <!--桌面小配件-->
         <receiver android:name=".widget.Awidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widge_provider" />
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.seewo.homewidgets.action.CLICK" />
-            </intent-filter>
         </receiver>
+        <!--桌面小配件的服务-->
+        <service android:name=".service.WidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
         <!--图片选择器-->
         <activity
             android:theme="@style/NoActionBarFullscreen"
@@ -74,7 +78,7 @@
             android:screenOrientation="portrait"/>
         <!--主界面-->
         <activity android:name=".ui.BottomNavigationActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.Translucent"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait">
             <!--<intent-filter>-->
@@ -107,7 +111,7 @@
             android:screenOrientation="portrait"/>
         <!--测试界面-->
         <activity android:name=".test.TestActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.Translucent"
             android:screenOrientation="portrait">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->

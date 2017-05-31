@@ -3,13 +3,22 @@ package com.example.stxr.zzu_app.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.example.stxr.zzu_app.R;
+import com.example.stxr.zzu_app.service.WidgetService;
+import com.example.stxr.zzu_app.utils.DataUtils;
+
+import java.util.Calendar;
+
+import cn.bmob.v3.BmobUser;
+
 
 /*
  *  项目名：  ZZU_App
@@ -20,31 +29,55 @@ import com.example.stxr.zzu_app.R;
  *  描述：    
  */
 public class Awidget extends AppWidgetProvider {
-    public static final String CLICK_ACTION = "com.seewo.appwidgettest.action.CLICK"; // 点击事件的广播ACTION
-    /**
-     * 每次窗口小部件被更新都调用一次该方法
-     */
+    public static final String EXTRA_ITEM = "com.stxr.zzu_app.EXTRA_ITEM";
+    public static final String TOAST_ACTION = "com.stxr.zzu_app.TOAST_ACTION"; // 点击事件的广播ACTION
+    private String[] months={"一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"};
+    private String[] days={"星期一","星期二","星期三","星期四","星期五","星期六","星期日"};
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        super.onUpdate(context, appWidgetManager, appWidgetIds);
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-        Intent intent = new Intent(CLICK_ACTION);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, R.id.doge_imageView, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.doge_imageView, pendingIntent);
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager,
+                         int[] appWidgetIds) {
+        // TODO Auto-generated method stub
 
-        for (int appWidgetId : appWidgetIds) {
-            appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+        RemoteViews remoteViews=new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+//        Time time=new Time();
+//        time.setToNow();
+//        String month=time.year+" "+months[time.month];
+//        remoteViews.setTextViewText(R.id.txtDay, new Integer(time.monthDay).toString());
+//        remoteViews.setTextViewText(R.id.txtMonth, month);
+//        remoteViews.setTextViewText(R.id.txtWeekDay, days[time.weekDay]);
+        String name;
+        if (BmobUser.getCurrentUser() != null) {
+            name = BmobUser.getCurrentUser().getUsername()+"的课表";
+        } else {
+            name = "请登录";
         }
+        remoteViews.setTextViewText(R.id.tv_widgetName,name);
+        remoteViews.setTextViewText(R.id.tv_widgetWeek,days[DataUtils.getWeekday()-1]);
+        //设置适配器
+        Intent intent = new Intent(context, WidgetService.class);
+        remoteViews.setRemoteAdapter(R.id.ll_widgetCourse, intent);
+        //当适配器列表为空时，直接显示空
+//        remoteViews.setEmptyView(R.id.ll_widgetCourse,);
+        //zuowei broadcasdReceiver组件
+        Intent toasIntent = new Intent(context, Awidget.class).setAction(TOAST_ACTION);
+        PendingIntent pendingIntent=PendingIntent.getBroadcast(context, 0, toasIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        //将pendingIntent 和 listview进行关联
+        remoteViews.setPendingIntentTemplate(R.id.ll_widgetCourse, pendingIntent);
+//        remoteViews.setOnClickPendingIntent(R.id.layout, pendingIntent);
+//        appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
+
+        appWidgetManager.updateAppWidget(new ComponentName(context, Awidget.class), remoteViews);
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
-    /**
-     * 接收窗口小部件点击时发送的广播
-     */
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        // TODO Auto-generated method stub
         super.onReceive(context, intent);
-
-        if (CLICK_ACTION.equals(intent.getAction())) {
-            Toast.makeText(context, "hello crab!", Toast.LENGTH_SHORT).show();
+        if(intent.getAction().equals(TOAST_ACTION)){
+            int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
+            Toast.makeText(context, "点击了第"+viewIndex+"个"
+                    , Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -14,7 +14,8 @@
         <!--用appBarLayout包裹可以防止toolbar与Fragment重合的问题-->
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -22,7 +23,7 @@
                 android:background="@color/colorPrimary"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+                />
         </android.support.design.widget.AppBarLayout>
         <!--内容区域-->
         <LinearLayout
