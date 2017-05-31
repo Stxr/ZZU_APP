@@ -12,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.print.PrintHelper;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -35,10 +36,12 @@ import com.example.stxr.zzu_app.fragment.ExchangeFragment;
 import com.example.stxr.zzu_app.fragment.UserFragment;
 import com.example.stxr.zzu_app.utils.DataUtils;
 import com.example.stxr.zzu_app.utils.ShareUtils;
+import com.example.stxr.zzu_app.utils.T;
 import com.example.stxr.zzu_app.utils.UtilTools;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import cn.bmob.v3.BmobUser;
@@ -64,8 +67,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
     private CourseOnlineFragment courseOnlineFragment;
     private ExchangeFragment exchangeFragment;
     private CourseTableFragment courseTableFragment;
-//    private UserFragment userFragment;
-    private BadgeItem badgeItem;
+    //    private UserFragment userFragment;
     private FloatingActionButton fab;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -93,6 +95,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
 
     private void initData() {
         fab.setVisibility(View.GONE);
+        tv_name.setOnClickListener(this);
         profileImage.setOnClickListener(this);
         fab.setOnClickListener(this);
         setSupportActionBar(toolbar);
@@ -117,6 +120,15 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
     private void setupDrawerContent(final NavigationView navigationView) {
         MyUser userInfo = BmobUser.getCurrentUser(MyUser.class);
         setUserInfo(userInfo.getUsername(), userInfo.isSex() ? "男" : "女", userInfo.getDesc(), null);
+
+        String bind = ShareUtils.getString(BottomNavigationActivity.this, "xuehao", null);
+        if (bind == null) {
+            bind = "学生账号绑定";
+        }else{
+            bind = "账号"+ShareUtils.getString(BottomNavigationActivity.this, "xuehao", null)+"已绑定";
+        }
+        navigationView.getMenu().getItem(1).getSubMenu().getItem(0).setTitle(bind);
+
         UtilTools.getImageFromSD(this, userInfo.getObjectId() + ".jpg", profileImage);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             Intent intent;
@@ -124,9 +136,9 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    //信息更改
-                    case R.id.nav_infoChange:
-                        sendData(intent);
+                    //离线查询
+                    case R.id.nav_search:
+                        startActivity(new Intent(BottomNavigationActivity.this, CourseOutLine.class));
                         break;
                     //倒计时
                     case R.id.nav_countDown:
@@ -142,6 +154,10 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
                         BmobUser.logOut();   //清除缓存用户对象
                         startActivity(new Intent(BottomNavigationActivity.this, LoginActivity.class));
                         finish();
+                        break;
+                    case R.id.nav_sex:
+                    case R.id.nav_info:
+                        sendData(new Intent());
                         break;
                 }
                 //取消菜单的选中状态
@@ -170,8 +186,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
         bottom_navigation_bar_container.setMode(BottomNavigationBar.MODE_DEFAULT);
         bottom_navigation_bar_container.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
         bottom_navigation_bar_container.setBarBackgroundColor(R.color.colorPrimary);//背景颜色
-        bottom_navigation_bar_container.setInActiveColor(R.color.colorPrimaryLight);//未选中时的颜色
-        bottom_navigation_bar_container.setActiveColor(R.color.colorPrimaryDark);//选中时的颜色
+        bottom_navigation_bar_container.setInActiveColor(R.color.colorPrimaryDark);//未选中时的颜色
+        bottom_navigation_bar_container.setActiveColor(R.color.colorPrimaryLight);//选中时的颜色
 //        badgeItem = new BadgeItem().setBackgroundColor(Color.RED).setText("99").setHideOnSelect(true);//角标
         bottom_navigation_bar_container
                 .addItem(new BottomNavigationItem(R.drawable.ic_dashboard_white_24dp, R.string.title1))
@@ -308,7 +324,12 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
                 break;
             //考试倒计时
             case COUNTDOWN_REQUEST_CODE:
-                countDown(data);
+                if (data != null) {
+                    countDown(data);
+                }
+                break;
+            case 1:
+                exchangeFragment.showData(10);
                 break;
         }
     }
@@ -354,15 +375,28 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent();
+//        Intent intent = new Intent();
         switch (v.getId()) {
             case R.id.fab:
                 startActivityForResult(new Intent(this, PassageActivity.class), 1);
                 break;
+            case R.id.tv_userName:
             case R.id.userProfile:
-                sendData(intent);
+                sendData(new Intent());
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String bind = ShareUtils.getString(BottomNavigationActivity.this, "xuehao", null);
+        if (bind == null) {
+            bind = "学生账号绑定";
+        }else{
+            bind = "账号"+ShareUtils.getString(BottomNavigationActivity.this, "xuehao", null)+"已绑定";
+        }
+        navigationView.getMenu().getItem(1).getSubMenu().getItem(0).setTitle(bind);
     }
 
     //发送个人信息数据给修改的activity

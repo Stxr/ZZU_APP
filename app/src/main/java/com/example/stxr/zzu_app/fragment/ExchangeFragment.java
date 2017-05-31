@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.example.stxr.zzu_app.R;
 import com.example.stxr.zzu_app.adapter.PassageAdapter;
 import com.example.stxr.zzu_app.bean.MyBBS;
+import com.example.stxr.zzu_app.bean.MyUser;
 import com.example.stxr.zzu_app.ui.ShowPassageActivity;
 import com.example.stxr.zzu_app.utils.L;
 import com.example.stxr.zzu_app.utils.T;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
@@ -98,7 +100,7 @@ public class ExchangeFragment extends Fragment {
         });
     }
 
-    private void showData(int num) {
+    public void showData(int num) {
         BmobQuery<MyBBS> q = new BmobQuery<>();
         //按时间降序排序
         q.order("-createdAt");
@@ -127,7 +129,7 @@ public class ExchangeFragment extends Fragment {
         });
     }
 
-    private void loadMoreData(int num) {
+    public void loadMoreData(int num) {
         BmobQuery<MyBBS> q = new BmobQuery<>();
         //按时间降序排序
         q.order("-createdAt");
@@ -196,34 +198,37 @@ public class ExchangeFragment extends Fragment {
 
                                 }
                             });
-                            startActivityForResult(intent,52);
+                             startActivityForResult(intent,52);
                         }
                     });
                     pad.setOnItemLongClickListener(new PassageAdapter.OnRecyclerViewItemLongClickListener() {
                         @Override
                         public void onItemLongClick(final View view, final MyBBS myBBS) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                            builder.setTitle("提示");
-                            builder.setMessage("确定删除此帖？");
-                            builder.setCancelable(false);
-                            builder.setNegativeButton("取消", null);
-                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    myBBS.delete(new UpdateListener() {
-                                        @Override
-                                        public void done(BmobException e) {
-                                            if (e == null) {
-                                                T.shortShow(getContext(), "删除成功");
-                                                showData(numsLoad);
-                                            } else {
-                                                T.shortShow(getContext(), "删除失败"+e.getMessage());
+                            if(myBBS.getAuthor().getObjectId().equals(BmobUser.getCurrentUser(MyUser.class).getObjectId())){
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("提示");
+                                builder.setMessage("确定删除此帖？");
+                                builder.setCancelable(false);
+                                builder.setNegativeButton("取消", null);
+                                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        myBBS.delete(new UpdateListener() {
+                                            @Override
+                                            public void done(BmobException e) {
+                                                if (e == null) {
+                                                    T.shortShow(getContext(), "删除成功");
+                                                    showData(numsLoad);
+                                                } else {
+                                                    T.shortShow(getContext(), "删除失败"+e.getMessage());
+                                                }
                                             }
-                                        }
-                                    });
-                                }
-                            });
-                            builder.create().show();
+                                        });
+                                    }
+                                });
+                                builder.create().show();
+                            }
+
                         }
                     });
                     break;

@@ -39,6 +39,16 @@
                 </action>
             </intent-filter>
         </service>
+
+        <receiver android:name=".widget.Awidget">
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widge_provider" />
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.seewo.homewidgets.action.CLICK" />
+            </intent-filter>
+        </receiver>
         <!--图片选择器-->
         <activity
             android:theme="@style/NoActionBarFullscreen"
@@ -46,6 +56,9 @@
             android:screenOrientation="portrait" />
         <activity android:name=".ui.InfoChangeActivity"
             android:label="我的资料"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.CourseOutLine"
+            android:label="离线查询"
             android:screenOrientation="portrait"/>
         <!--修改昵称-->
         <activity android:name=".ui.ChangeNameAcitvity"
@@ -71,6 +84,7 @@
         </activity>
         <!--绑定账号的界面-->
         <activity android:name=".ui.BindActivity"
+            android:label="绑定账号"
             android:screenOrientation="portrait"/>
         <!--显示文章的界面-->
         <activity android:name=".ui.ShowPassageActivity"

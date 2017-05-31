@@ -21,6 +21,7 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -77,7 +78,8 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
     private Subscription subsLoading;
     private SwipeRefreshLayout srl_passage_refresh;
     private NestedScrollView scrollView;
-    private CustomDialog dialog;
+    private InputMethodManager imm;
+    private FrameLayout fl_commit;
     private View.OnClickListener replyCommentsListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -92,8 +94,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
             final int parentPosition = (Integer) view.getTag(R.id.replyParentPosition);
             final Comments comments = commentsList.get(parentPosition);
             if (!Objects.equals(reply.getName(), BmobUser.getCurrentUser(MyUser.class).getUsername())) { //不能回复自己
-                tv_showReply.setVisibility(View.GONE);
-                ll_comment_send.setVisibility(View.VISIBLE);
+                showInput();
                 btn_comment_send.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -116,17 +117,13 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                                 }
                             });
                             //恢复成原来的样子
-                            edt_comment.setText("");
-                            tv_showReply.setVisibility(View.VISIBLE);
-                            ll_comment_send.setVisibility(View.GONE);
+                            hideInput();
                             //显示
                             LinearLayoutManager layout = new LinearLayoutManager(ShowPassageActivity.this);
                             rv_showComments.setLayoutManager(layout);
                             CommitAdapter commitAdapter = new CommitAdapter(ShowPassageActivity.this, commentsList, ShowPassageActivity.this, itemClickListener);
                             rv_showComments.setAdapter(commitAdapter);
-                            //隐藏输入框
-                            InputMethodManager imm = (InputMethodManager) getSystemService(ShowPassageActivity.INPUT_METHOD_SERVICE);
-                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+
                         } else {
                             L.i("回复不能为空");
                             T.shortShow(ShowPassageActivity.this, "回复内容不能为空");
@@ -148,8 +145,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void initData() {
-        dialog = new CustomDialog(this, 100, 100, R.layout.dialog_loding, R.style.Theme_dialog, Gravity.CENTER, R.style.pop_anim_style);
-        dialog.setCancelable(false);
+        imm = (InputMethodManager) getSystemService(ShowPassageActivity.INPUT_METHOD_SERVICE);
         tv_showTitle.setText(getIntent().getStringExtra("title"));
         tv_author.setText(getIntent().getStringExtra("username"));
         tv_creatTime.setText(getIntent().getStringExtra("createdTime"));
@@ -173,23 +169,22 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                 }
             });
         }
-
+        fl_commit.setVisibility(View.INVISIBLE);
     }
 
     private void updataPassage() {
-        dialog.show();
         rtv_showContent.post(new Runnable() {
             @Override
             public void run() {
                 rtv_showContent.clearAllLayout();
                 showDataSync(getIntent().getStringExtra("content"));
-                dialog.dismiss();
             }
         });
 
     }
 
     private void initView() {
+        fl_commit = (FrameLayout) findViewById(R.id.fl_commit);
         srl_passage_refresh = (SwipeRefreshLayout) findViewById(R.id.srl_passage_refresh);
         rtv_showContent = (RichTextView) findViewById(R.id.rtv_showContent);
         tv_creatTime = (TextView) findViewById(R.id.tv_creatTime);
@@ -203,6 +198,8 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         tv_showReply.setOnClickListener(this);
         //解决RecycleView 和ScrollView嵌套时的卡的问题
         rv_showComments.setNestedScrollingEnabled(false);
+        //防止更新内容时候定位到底部
+        rv_showComments.setFocusable(false);
         scrollView = (NestedScrollView) findViewById(R.id.sv_content);
     }
 
@@ -222,12 +219,27 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                 break;
         }
     }
-
-    private void reply(final int position) {
-        //显示回复文本框
+    private void showInput(){
         tv_showReply.setVisibility(View.GONE);
         ll_comment_send.setVisibility(View.VISIBLE);
-
+        edt_comment.requestFocus();
+        if (imm != null) {
+            imm.showSoftInput(edt_comment,0);
+        }
+    }
+    private void hideInput() {
+        edt_comment.setText("");
+        tv_showReply.setVisibility(View.VISIBLE);
+        ll_comment_send.setVisibility(View.GONE);
+        //隐藏输入框
+        //  InputMethodManager imm = (InputMethodManager) getSystemService(ShowPassageActivity.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+    private void reply(final int position) {
+        //显示回复文本框
+        showInput();
         btn_comment_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -241,12 +253,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                             //添加并上传评论
                             showComment(commit(text));
                             //恢复成原来的样子
-                            edt_comment.setText("");
-                            tv_showReply.setVisibility(View.VISIBLE);
-                            ll_comment_send.setVisibility(View.GONE);
-                            //隐藏输入框
-                            InputMethodManager imm = (InputMethodManager) getSystemService(ShowPassageActivity.INPUT_METHOD_SERVICE);
-                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                            hideInput();
                         } else {
                             L.i("回复不能为空");
                             T.shortShow(ShowPassageActivity.this, "回复内容不能为空");
@@ -273,18 +280,12 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                                 }
                             });
                             //恢复成原来的样子
-                            edt_comment.setText("");
-                            tv_showReply.setVisibility(View.VISIBLE);
-                            ll_comment_send.setVisibility(View.GONE);
+                            hideInput();
                             //显示
                             LinearLayoutManager layout = new LinearLayoutManager(ShowPassageActivity.this);
                             rv_showComments.setLayoutManager(layout);
                             CommitAdapter commitAdapter = new CommitAdapter(ShowPassageActivity.this, commentsList, ShowPassageActivity.this, itemClickListener);
 
-                            rv_showComments.setAdapter(commitAdapter);
-                            //隐藏输入框
-                            InputMethodManager imm = (InputMethodManager) getSystemService(ShowPassageActivity.INPUT_METHOD_SERVICE);
-                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                         } else {
                             L.i("回复不能为空");
                             T.shortShow(ShowPassageActivity.this, "回复内容不能为空");
@@ -327,7 +328,6 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
 //        layout.setReverseLayout(true);//列表翻转
         rv_showComments.setLayoutManager(layout);
         CommitAdapter commitAdapter = new CommitAdapter(this, commentsList, this, itemClickListener);
-
         rv_showComments.setAdapter(commitAdapter);
     }
 
@@ -351,6 +351,9 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
         query.findObjects(new FindListener<Comments>() {
             @Override
             public void done(List<Comments> list, BmobException e) {
+                if (list.size() != 0) {
+                    fl_commit.setVisibility(View.VISIBLE);
+                }
                 LinearLayoutManager layout = new LinearLayoutManager(ShowPassageActivity.this);
 //                layout.setStackFromEnd(true);//列表再底部开始展示，反转后由上面开始展示
 //                layout.setReverseLayout(true);//列表翻转
@@ -379,7 +382,6 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                     break;
                 case 111:
                     updataPassage();
-                    dialog.dismiss();
                     break;
 
             }
@@ -438,29 +440,6 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                                 }
                             }
                         });
-//                        MyBBS myBBS = new MyBBS();
-//                        myBBS.setObjectId(getIntent().getStringExtra("ObjectID"));
-//
-//                        BmobFile file = new BmobFile(fileName, "", fileUrl);
-//                        file.download(new File(imagePath), new DownloadFileListener() {
-//                            @Override
-//                            public void done(String s, BmobException e) {
-//                                if (e == null) {
-//                                    T.shortShow(ShowPassageActivity.this, "下载成功");
-//                                    L.e("下载路径：" + s);
-////                                    subscriber.onNext(s);
-//                                    //  showEditData(subscriber,html);
-//                                } else {
-//                                    T.shortShow(ShowPassageActivity.this, "下载失败");
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onProgress(Integer integer, long l) {
-//
-//                            }
-//                        });
-//                        subscriber.onNext(imagePath);
                     }
                 } else {
                     subscriber.onNext(text);
@@ -479,7 +458,6 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
      * @param html
      */
     private void showDataSync(final String html) {
-//        dialog.show();
 //        loadingDialog.show();
 
         subsLoading = Observable.create(new Observable.OnSubscribe<String>() {
@@ -495,12 +473,10 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
                     @Override
                     public void onCompleted() {
 //                        loadingDialog.dismiss();
-//                        dialog.dismiss();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        dialog.dismiss();
 //                        loadingDialog.dismiss();
                         e.printStackTrace();
                         T.shortShow(ShowPassageActivity.this, "图片不存在或已损坏，请刷新重试");

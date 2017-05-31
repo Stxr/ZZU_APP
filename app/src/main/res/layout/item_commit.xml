@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:textSize="12dp"
+                android:textSize="14sp"
                 android:id="@+id/tv_commit_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -42,9 +42,15 @@
                 />
         </RelativeLayout>
 
-
+        <TextView
+            android:textSize="12dp"
+            android:id="@+id/tv_commit_time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="时间" />
         <TextView
             android:textSize="16dp"
+            android:textColor="@color/colorPrimaryText"
             android:id="@+id/tv_commit_content"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

@@ -6,6 +6,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:background="@android:color/white">
         <TextView
             android:id="@+id/year"
@@ -26,12 +27,28 @@
             />
         <!--下拉方式选周数-->
         <Spinner
+            android:layout_weight="1"
             android:id="@+id/switchWeek"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:layout_gravity="center"
             />
+        <!--竖线-->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="#00FFFF"
+            />
+        <Button
+            android:id="@+id/btn_setting"
+            android:background="@null"
+            android:text="设置"
+            android:layout_width="44dp"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
     <!--分隔线-->
@@ -45,10 +62,12 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:background="@android:color/white">
+
         <com.example.stxr.zzu_app.ui.WeekTitle
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:id="@+id/weekTitle" />
     </LinearLayout>
     <!--显示课表详细信息-->
     <ScrollView

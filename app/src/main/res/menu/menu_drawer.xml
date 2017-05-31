@@ -23,9 +23,8 @@
                     android:id="@+id/nav_bind"
                     android:title="教务处账号绑定" />
                 <item
-                    android:id="@+id/nav_infoChange"
-                    android:title="资料更改" />
-
+                    android:id="@+id/nav_search"
+                    android:title="离线查询" />
                 <item
                     android:id="@+id/nav_countDown"
                     android:title="考试倒计时" />

@@ -63,6 +63,7 @@ public class CommitAdapter extends RecyclerView.Adapter<CommitAdapter.CommitView
         holder.itemView.setTag(commentsList.get(position));
         holder.tv_name.setText(commentsList.get(position).getAuthor().getUsername());
         holder.tv_content.setText(commentsList.get(position).getContents());
+        holder.tv_time.setText(commentsList.get(position).getCreatedAt());
         MyUser user = commentsList.get(position).getAuthor();
         String path = BMOB_IAMGE_CACHE + user.getObjectId()+".jpg";
         File f= new File(path);
@@ -122,8 +123,10 @@ public class CommitAdapter extends RecyclerView.Adapter<CommitAdapter.CommitView
         private CircleImageView civ_user_image;
         private RecyclerView rv_reply;
         private TextView tv_reply;
+        private TextView tv_time;
         public CommitViewHolder(View itemView) {
             super(itemView);
+            tv_time = (TextView) itemView.findViewById(R.id.tv_commit_time);
             tv_content = (TextView) itemView.findViewById(R.id.tv_commit_content);
             tv_name = (TextView) itemView.findViewById(R.id.tv_commit_name);
             civ_user_image = (CircleImageView) itemView.findViewById(R.id.civ_user_image);

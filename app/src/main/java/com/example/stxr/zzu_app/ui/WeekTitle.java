@@ -64,7 +64,7 @@ public class WeekTitle extends View {
                 System.out.println("画出当前的日期!");
             }
             canvas.drawText(days[i], currentPosition, 30, mPaint);
-            currentPosition += offset;
+            currentPosition += offset+8;
         }
         //调用父类的绘图方法
         super.onDraw(canvas);

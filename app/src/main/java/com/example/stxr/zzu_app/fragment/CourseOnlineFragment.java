@@ -20,6 +20,7 @@ import com.example.stxr.zzu_app.R;
 import com.example.stxr.zzu_app.adapter.CourseOnlineAdapter;
 import com.example.stxr.zzu_app.bean.ClassroomFree;
 import com.example.stxr.zzu_app.test.TestActivity;
+import com.example.stxr.zzu_app.utils.DataUtils;
 import com.example.stxr.zzu_app.utils.HttpUtils;
 import com.example.stxr.zzu_app.utils.L;
 import com.example.stxr.zzu_app.utils.ShareUtils;
@@ -31,6 +32,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -64,12 +66,24 @@ public class CourseOnlineFragment extends Fragment implements View.OnClickListen
 
     private void initData() {
         btn_search.setOnClickListener(this);
+        btn_search.getBackground().setAlpha(72);
     }
     private void findView() {
         rv_courseOnline = (RecyclerView) view.findViewById(R.id.rv_courseOnline);
         btn_search = (Button) view.findViewById(R.id.btn_search);
         sp_weekday = (Spinner) view.findViewById(R.id.sp_weekday);
         sp_courseTime = (Spinner) view.findViewById(R.id.sp_classTime);
+        sp_weekday.setSelection(DataUtils.getWeekday()-1);
+        String time =  DataUtils.getClassLabel();
+        if (time.equals("%")) {
+            time = 1 + "";
+        }
+        sp_courseTime.setSelection(Integer.parseInt(time)-1);
+        login();
+//                handler.sendEmptyMessageDelayed(DELAY, 500);
+        int weekDay = sp_weekday.getSelectedItemPosition() + 1;
+        int coursetime = sp_courseTime.getSelectedItemPosition() + 1;
+        query(weekDay,coursetime);
     }
     @Override
     public void onClick(View v) {
@@ -79,16 +93,20 @@ public class CourseOnlineFragment extends Fragment implements View.OnClickListen
 //                handler.sendEmptyMessageDelayed(DELAY, 500);
                 int weekDay = sp_weekday.getSelectedItemPosition() + 1;
                 int coursetime = sp_courseTime.getSelectedItemPosition() + 1;
-                T.shortShow(getActivity(),"星期" + weekDay + "第" + coursetime + "节");
                 query(weekDay,coursetime);
                 break;
         }
     }
     void login() {
         HashMap<String, String> key = new HashMap<>();
-        key.put("zhanghao",ShareUtils.getString(getActivity(),"xuehao",""));
+        String zhanghao = ShareUtils.getString(getActivity(),"xuehao","");
+        String mima = ShareUtils.getString(getActivity(),"mima","");
+        if (zhanghao.equals("") || mima.equals("")) {
+            T.shortShow(getActivity(),"请绑定学校账号");
+        }
+        key.put("zhanghao",zhanghao);
 //        key.put("nianji","2014");
-        key.put("mima", ShareUtils.getString(getActivity(),"mima",""));
+        key.put("mima",mima);
         HttpUtils.doPost("http://jw.zzu.edu.cn/scripts/freeroom/freeroom.dll/mylogin", key, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

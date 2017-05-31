@@ -10,10 +10,7 @@
         android:layout_height="130dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="72dp"
-        android:background="@drawable/crub" />
-
-
-
+        android:src="@drawable/classroom" />
 
     <com.wrapp.floatlabelededittext.FloatLabeledEditText
         android:layout_below="@id/imooc_logo"

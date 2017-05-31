@@ -2,22 +2,34 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    >
+    android:padding="16dp">
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:src="@drawable/classroom"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
     <TextView
-        android:textColor="@color/colorPrimaryText"
+        android:layout_below="@id/iv_logo"
+        android:id="@+id/tv_welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textSize="36sp"
+        android:paddingTop="32dp"
         android:text="@string/splash_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="36sp" />
+
     <TextView
-        android:visibility="gone"
-        android:textColor="@color/colorSecondaryText"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:textSize="16sp"
-        android:text="浮躁的小螃蟹@版权所有"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="浮躁的小螃蟹@版权所有"
+        android:textColor="@color/colorSecondaryText"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
 </RelativeLayout>

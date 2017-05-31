@@ -1,15 +1,19 @@
 package com.example.stxr.zzu_app.fragment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,6 +32,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,7 +48,7 @@ import okhttp3.Response;
  *  创建时间:  2017/4/25 11:27
  *  描述：    
  */
-public class CourseTableFragment extends Fragment {
+public class CourseTableFragment extends Fragment implements View.OnClickListener {
     private Spinner spinner;
 
     private GridView detailCource;
@@ -62,6 +67,7 @@ public class CourseTableFragment extends Fragment {
 
     private View v;
 
+    private Button btn_setting;
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -75,9 +81,9 @@ public class CourseTableFragment extends Fragment {
                     for (int j = 1; j < course.get(1).childNodeSize(); j++) {
                         courseTable[i - 1][j - 1] = course.get(i).child(j).text() == null ? "" : course.get(i).child(j).text();
                     }
-                    L.e(courseTable[i - 1][1] + courseTable[i - 1][1] + courseTable[i - 1][2]
-                            + courseTable[i - 1][3] + courseTable[i - 1][4] + courseTable[i - 1][5]
-                            + courseTable[i - 1][6] + courseTable[i - 1][7]);
+//                    L.e(courseTable[i - 1][1] + courseTable[i - 1][1] + courseTable[i - 1][2]
+//                            + courseTable[i - 1][3] + courseTable[i - 1][4] + courseTable[i - 1][5]
+//                            + courseTable[i - 1][6] + courseTable[i - 1][7]);
                 }
                 secondAdapter = new AbsGridAdapter(getContext());
                 secondAdapter.setContent(courseTable, 5, 7);
@@ -94,12 +100,7 @@ public class CourseTableFragment extends Fragment {
         initView();
         initData();
 
-        //////////////创建Spinner数据
-        fillDataList();
-        spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, dataList);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
-        tv_year.setText(DataUtils.getYear());//得到年份
+
         return v;
     }
 
@@ -125,7 +126,14 @@ public class CourseTableFragment extends Fragment {
                 mHandler.sendMessage(msg);
             }
         });
-
+        //////////////创建Spinner数据
+        fillDataList();
+        spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, dataList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        btn_setting.setOnClickListener(this);
+        tv_year.setText(DataUtils.getYear());//得到年份
+        spinner.setSelection(Calendar.WEEK_OF_YEAR-ShareUtils.getInt(getContext(),"weekOfSchool",0));
     }
 
     @Override
@@ -141,12 +149,36 @@ public class CourseTableFragment extends Fragment {
         spinner = (Spinner) v.findViewById(R.id.switchWeek);
         detailCource = (GridView) v.findViewById(R.id.courceDetail);
         tv_year = (TextView) v.findViewById(R.id.year);
+        btn_setting = (Button)v.findViewById(R.id.btn_setting);
     }
 
     public void fillDataList() {
         dataList = new ArrayList<>();
         for (int i = 1; i < 21; i++) {
             dataList.add("第" + i + "周");
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_setting:
+                String string;
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("设置当前周")
+                        .setItems(dataList.toArray(new String[0]), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int week = Calendar.WEEK_OF_YEAR - which;
+                                ShareUtils.putInt(getContext(),"weekOfSchool",week);
+//                                T.shortShow(getActivity(),"当前是"+(Calendar.WEEK_OF_YEAR-week));
+                                spinner.setSelection(Calendar.WEEK_OF_YEAR-ShareUtils.getInt(getContext(),"weekOfSchool",0));
+                                T.shortShow(getActivity(),"设置成功，当前周为"+(Calendar.WEEK_OF_YEAR-week+1)+"周");
+                            }
+                        })
+                        .setNegativeButton("取消",null)
+                        .create().show();
+                break;
         }
     }
 }

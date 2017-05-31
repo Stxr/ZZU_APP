@@ -12,6 +12,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.print.PrintHelper;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -139,5 +141,29 @@ public class BindActivity extends BaseActivity implements View.OnClickListener {
                 break;
 
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.unbind,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_unbind:
+                ShareUtils.deleShare(BindActivity.this,"xuehao");
+                ShareUtils.deleShare(BindActivity.this,"mima");
+                ShareUtils.deleShare(BindActivity.this,"year");
+                ShareUtils.deleShare(BindActivity.this,"nianji");
+                ShareUtils.deleShare(BindActivity.this,"idBind");
+                edt_bind_id.setText("");
+                edt_bind_password.setText("");
+                sp_year.setSelection(0);
+                T.shortShow(BindActivity.this, "已解除绑定");
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
