@@ -1,20 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@+id/ll_widgetItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
     android:orientation="vertical">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textSize="16dp"
+            android:textColor="@color/colorPrimaryText"
+            android:hint="微积分"
+            android:id="@+id/tv_widgetItem_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:paddingLeft="8dp"
+            android:textColor="@color/colorSecondaryText"
+            android:hint="周国平"
+            android:id="@+id/tv_widgetItem_teacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:paddingLeft="8dp"
+            android:textColor="@color/colorSecondaryText"
+            android:hint="单周"
+            android:id="@+id/tv_widgetItem_interval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <TextView
+        android:hint="14:00-15:40"
+        android:textColor="@color/colorSecondaryText"
+        android:id="@+id/tv_widgetItem_time"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
-        android:textColor="@color/colorPrimaryText"
-        android:padding="8dp"
-        android:hint="微积分"
-        android:id="@+id/tv_widgetItem"
-        android:layout_width="match_parent"
+        android:hint="北1_101"
+        android:textColor="@color/colorSecondaryText"
+        android:id="@+id/tv_widgetItem_location"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
+        android:layout_margin="8dp"
         android:alpha="0.1"
         android:background="@color/colorAccent"
         android:layout_width="match_parent"

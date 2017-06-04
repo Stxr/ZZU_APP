@@ -15,6 +15,9 @@ import android.support.v7.app.AppCompatActivity;
 import com.example.stxr.zzu_app.R;
 import com.example.stxr.zzu_app.statics.StaticConstant;
 
+import static com.example.stxr.zzu_app.statics.StaticConstant.READ_EXTERNAL_STORAGE_REQUEST_CODE;
+import static com.example.stxr.zzu_app.statics.StaticConstant.WRITE_EXTERNAL_STORAGE_REQUEST_CODE;
+
 /*
  *  项目名：  ZZU_App
  *  包名：    com.example.stxr.zzu_app.ui
@@ -28,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        permission();
+//        permission();
         initView();
     }
 
@@ -56,50 +59,23 @@ public class SplashActivity extends AppCompatActivity {
             }
         }
     };
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case StaticConstant.MY_PERMISSIONS_REQUEST_READ_CONTACTS:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        switch (requestCode) {
+//            case StaticConstant.MY_PERMISSIONS_REQUEST_READ_CONTACTS:
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//                    // permission was granted, yay! Do the
+//                    // contacts-related task you need to do.
+//
+//                } else {
+//
+//                    // permission denied, boo! Disable the
+//                    // functionality that depends on this permission.
+//                }
+//                break;
+//        }
+//    }
 
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                break;
-        }
-    }
-
-    private void permission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        StaticConstant.MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        }
-    }
 }

@@ -78,6 +78,10 @@ public class UtilTools {
 
     //从sd 卡读取图片
     public static boolean getImageFromSD(final Context context, String filename, final ImageView imageView) {
+        File dir = new File(BMOB_IAMGE_CACHE);
+        if (!dir.exists()) {
+            boolean is = dir.mkdir();
+        }
         String path = BMOB_IAMGE_CACHE +filename;
         File f= new File(path);
         //如果文件不存在

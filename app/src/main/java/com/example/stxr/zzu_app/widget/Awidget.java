@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.example.stxr.zzu_app.R;
 import com.example.stxr.zzu_app.service.WidgetService;
+import com.example.stxr.zzu_app.ui.BottomNavigationActivity;
+import com.example.stxr.zzu_app.ui.LoginActivity;
 import com.example.stxr.zzu_app.utils.DataUtils;
 
 import java.util.Calendar;
@@ -53,6 +55,7 @@ public class Awidget extends AppWidgetProvider {
         }
         remoteViews.setTextViewText(R.id.tv_widgetName,name);
         remoteViews.setTextViewText(R.id.tv_widgetWeek,days[DataUtils.getWeekday()-1]);
+        remoteViews.setTextViewText(R.id.tv_widgetWeekNum,"第" + (DataUtils.getThisWeek(context,20)+1) + "周");
         //设置适配器
         Intent intent = new Intent(context, WidgetService.class);
         remoteViews.setRemoteAdapter(R.id.ll_widgetCourse, intent);
@@ -76,8 +79,17 @@ public class Awidget extends AppWidgetProvider {
         super.onReceive(context, intent);
         if(intent.getAction().equals(TOAST_ACTION)){
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
-            Toast.makeText(context, "点击了第"+viewIndex+"个"
-                    , Toast.LENGTH_SHORT).show();
+            Intent newIntent;
+            if (BmobUser.getCurrentUser() != null) {
+                newIntent = new Intent(context, BottomNavigationActivity.class);
+                newIntent.putExtra("widget",true);
+            } else {
+                newIntent = new Intent(context, LoginActivity.class);
+            }
+            newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            context.startActivity(newIntent);
+//            Toast.makeText(context, "点击了第"+viewIndex+"个"
+//                    , Toast.LENGTH_SHORT).show();
         }
     }
 

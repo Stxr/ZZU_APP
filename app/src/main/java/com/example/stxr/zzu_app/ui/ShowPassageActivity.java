@@ -424,7 +424,7 @@ public class ShowPassageActivity extends BaseActivity implements View.OnClickLis
 
                                                         }
                                                     } else {
-                                                        T.shortShow(ShowPassageActivity.this, "下载失败");
+                                                        T.shortShow(ShowPassageActivity.this, "下载失败:"+e.getMessage());
                                                     }
                                                 }
 

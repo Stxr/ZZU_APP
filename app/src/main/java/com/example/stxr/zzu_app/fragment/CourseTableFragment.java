@@ -101,7 +101,7 @@ public class CourseTableFragment extends Fragment implements View.OnClickListene
                         if (value.equals("")) {
 //                            courseList.add(null);
                         } else {
-                            courseList.add(value);
+                            courseList.add(value+"xxx"+j+i);
                         }
 
                     }
@@ -157,16 +157,7 @@ public class CourseTableFragment extends Fragment implements View.OnClickListene
         spinner.setAdapter(spinnerAdapter);
         btn_setting.setOnClickListener(this);
         tv_year.setText(DataUtils.getYear());//得到年份
-        Date date = new Date();
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        int thisWeek = calendar.get(Calendar.WEEK_OF_YEAR) - ShareUtils.getInt(getContext(), "weekOfSchool", 0);
-        if (thisWeek > dataList.size()) {
-            thisWeek = dataList.size() - 1;
-        } else if (thisWeek < 0) {
-            thisWeek = 0;
-        }
-        spinner.setSelection(thisWeek);
+        spinner.setSelection(DataUtils.getThisWeek(getActivity(),dataList.size()));
     }
 
     @Override
@@ -208,8 +199,8 @@ public class CourseTableFragment extends Fragment implements View.OnClickListene
                                 int week = calendar.get(Calendar.WEEK_OF_YEAR) - which;
                                 ShareUtils.putInt(getContext(), "weekOfSchool", week);
 //                                T.shortShow(getActivity(),"当前是"+(Calendar.WEEK_OF_YEAR-week));
-                                spinner.setSelection(calendar.get(Calendar.WEEK_OF_YEAR) - ShareUtils.getInt(getContext(), "weekOfSchool", 0));
-                                T.shortShow(getActivity(), "设置成功，当前周为" + (calendar.get(Calendar.WEEK_OF_YEAR) - week + 1) + "周");
+                                spinner.setSelection(DataUtils.getThisWeek(getActivity(),dataList.size()));
+                                T.shortShow(getActivity(), "设置成功，当前周为" + (DataUtils.getThisWeek(getActivity(),dataList.size())+1) + "周");
                             }
                         })
                         .setNegativeButton("取消", null)

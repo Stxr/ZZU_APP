@@ -91,6 +91,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
         initView();
         initData();
         initBottomNavBar();
+
     }
 
     private void initData() {
@@ -114,6 +115,9 @@ public class BottomNavigationActivity extends AppCompatActivity implements View.
         String endTime = ShareUtils.getString(this, "targetTime", null);
         if (endTime != null) {
             updateCountDown(endTime);
+        }
+        if (getIntent().getBooleanExtra("widget", false)) {
+            bottom_navigation_bar_container.selectTab(2);
         }
     }
 

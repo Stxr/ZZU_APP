@@ -1,5 +1,6 @@
 package com.example.stxr.zzu_app.statics;
 
+import android.content.Context;
 import android.os.Environment;
 
 import java.util.HashMap;
@@ -21,8 +22,16 @@ public class StaticConstant {
     public static final int SET_SPECIALITY_CODE = 23;
     public static final int SET_SPECIALITY_BACK_CODE = 24;
     public static final int GET_ZOOM_PHOTO = 25;
-    public static final String BMOB_IAMGE_CACHE = Environment.getExternalStorageDirectory().getPath()+"/zzu_app/";
+//    public static final String BMOB_IAMGE_CACHE = Environment.getExternalStorageDirectory().getPath()+"/zzu_app/";
+    public static final String BMOB_IAMGE_CACHE = Environment.getExternalStorageDirectory().getAbsolutePath()+"/zzu_app/";
+
+    public static String BmobImageCache(Context context) {
+        return context.getFilesDir().getPath()+"/zzu_app/";
+    }
+
     public static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 779;
+    public static final int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 778;
+    public static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 777;
     //闪屏页的延时标志
     public static final int HANDLE_SPLASH =  1001;
     //数据库的名字

@@ -1,5 +1,6 @@
 package com.example.stxr.zzu_app.utils;
 
+import android.content.Context;
 import android.provider.ContactsContract;
 
 import java.text.SimpleDateFormat;
@@ -26,7 +27,6 @@ public class DataUtils {
 
     /**
      * @return 返回小时5
-     *
      */
     public static String getHour() {
         Date date = new Date();
@@ -72,30 +72,32 @@ public class DataUtils {
                 return 0;
         }
     }
+
     /**
      * 以友好的方式显示时间
+     *
      * @param time
      * @return
      */
     public static String getFriendlyTime(Date time) {
         //获取time距离当前的秒数
-        int ct = (int)((System.currentTimeMillis() - time.getTime())/1000);
-        if(ct == 0) {
+        int ct = (int) ((System.currentTimeMillis() - time.getTime()) / 1000);
+        if (ct == 0) {
             return "刚刚";
         }
-        if(ct > 0 && ct < 60) {
+        if (ct > 0 && ct < 60) {
             return ct + "秒前";
         }
-        if(ct >= 60 && ct < 3600) {
-            return Math.max(ct / 60,1) + "分钟前";
+        if (ct >= 60 && ct < 3600) {
+            return Math.max(ct / 60, 1) + "分钟前";
         }
-        if(ct >= 3600 && ct < 86400)
+        if (ct >= 3600 && ct < 86400)
             return ct / 3600 + "小时前";
-        if(ct >= 86400 && ct < 2592000){ //86400 * 30
-            int day = ct / 86400 ;
+        if (ct >= 86400 && ct < 2592000) { //86400 * 30
+            int day = ct / 86400;
             return day + "天前";
         }
-        if(ct >= 2592000 && ct < 31104000) { //86400 * 30
+        if (ct >= 2592000 && ct < 31104000) { //86400 * 30
             return ct / 2592000 + "月前";
         }
         return ct / 31104000 + "年前";
@@ -151,6 +153,80 @@ public class DataUtils {
         }
     }
 
+    /**
+     * 将序号转化为时间
+     * @param time 时间序号
+     * @param week 星期序号
+     * @return 星期一 8:00-9:00
+     */
+    public static String transTimetoCourse(int time, int week) {
+        String timeWeek;
+        String timeDay;
+        switch (time) {
+            case 1:
+                timeDay = "8:00-9:40";
+                break;
+            case 2:
+                timeDay = "10:10-11:50";
+                break;
+            case 3:
+                timeDay = "14:00-15:40";
+                break;
+            case 4:
+                timeDay = "16:00-17:40";
+                break;
+            case 5:
+                timeDay = "19:00-20:40";
+                break;
+            default:
+                timeDay = "";
+        }
+        switch (week) {
+            case 1:
+                timeWeek = "星期一";
+                break;
+            case 2:
+                timeWeek = "星期二";
+                break;
+            case 3:
+                timeWeek = "星期三";
+                break;
+            case 4:
+                timeWeek = "星期四";
+                break;
+            case 5:
+                timeWeek = "星期五";
+                break;
+            case 6:
+                timeWeek = "星期六";
+                break;
+            case 7:
+                timeWeek = "星期日";
+                break;
+            default:
+                timeWeek = "";
+        }
+        return timeWeek +" "+ timeDay;
+    }
+
+    /**
+     * 学校当前周
+     * @return 当前周
+     */
+
+    public static int getThisWeek(Context context,int max) {
+        int week;
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        week = calendar.get(Calendar.WEEK_OF_YEAR) - ShareUtils.getInt(context, "weekOfSchool", 0);
+        if (week >=max) {
+            week = max-1;
+        } else if (week < 0) {
+            week = 0;
+        }
+        return week;
+    }
     /**
      * 计算两个日期型的时间相差多少时间
      *
